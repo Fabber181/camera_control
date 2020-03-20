@@ -49,7 +49,7 @@ reset()
 
 // --------------- Synchro
 /* Fonction qui permet de donner les droits de la caméra au HD */
-synchro(perm)
+synchro(integer perm)
 {
 	// Gestion des droits de la camera
 	if (perm & PERMISSION_CONTROL_CAMERA)
@@ -69,7 +69,7 @@ deSynchro()
 {
     debug("Réinitialisation du script - révocation des droits");
     llSetCameraParams([CAMERA_ACTIVE, 0]);
-    llClearCameraParams()
+    llClearCameraParams();
     couleur(infoSynchro, couleur_rouge);    
 }
 
@@ -137,7 +137,7 @@ default
         if(perm & PERMISSION_CONTROL_CAMERA)
         {
              debug("run_time_permissions - PERMISSION_CONTROL_CAMERA : OK"+(string) perm);
-             couleur(infoSynchro, couleur_bleu);
+             couleur(infoSynchro, couleur_vert); // Avancement
         }
         if (perm & PERMISSION_TRACK_CAMERA)
         {
