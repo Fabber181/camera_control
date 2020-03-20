@@ -3,19 +3,25 @@
 // ======================================================
     integer modeDebug = TRUE;
     integer modeInfo = TRUE;
+    integer getToutchedPrim = TRUE; 
     // -- Identifiant des boutons
     // Synchro on
     integer boutonSynchro = 24;
     integer boutonDeSyncrho = 29;
     integer boutonTestCam = 25;
+    integer boutonGetCameraPosition = 22;
     integer boutonTesCam2 = 27;
     integer infoSynchro = 28;
     
+    // -- vues : 
+    vector cam-1_position = <0.0,0.0,0.0>;
+    vector cam_1_rotation = <0.0,0.0,0.0>;
+
     // Couleur
     vector couleur_bleu = <0.000, 0.455, 0.851>;
-    vector couleur_rouge = 	<1.000, 0.255, 0.212>;
+    vector couleur_rouge =     <1.000, 0.255, 0.212>;
     vector couleur_vert = <0.180, 0.800, 0.251> ;
-    
+
 
 // - debug
 debug(string message)
@@ -44,24 +50,24 @@ info(string message)
 */
 reset()
 {
-     couleur(infoSynchro, couleur_rouge); 
+     couleur(infoSynchro, couleur_rouge);
 }
 
 // --------------- Synchro
 /* Fonction qui permet de donner les droits de la caméra au HD */
 synchro(integer perm)
 {
-	// Gestion des droits de la camera
-	if (perm & PERMISSION_CONTROL_CAMERA)
-		debug("PERMISSION_CONTROL_CAMERA - Vous avez déjà les droit");
-	else
-		llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA);
-	
-	// Gestion des droits de tracking de la camera
-	if (perm & PERMISSION_TRACK_CAMERA)
-		debug("PERMISSION_TRACK_CAMERA - Vous avez déjà les droit");
-	else
-		llRequestPermissions(llGetOwner(), PERMISSION_TRACK_CAMERA);
+    // Gestion des droits de la camera
+    if (perm & PERMISSION_CONTROL_CAMERA)
+        debug("PERMISSION_CONTROL_CAMERA - Vous avez déjà les droit");
+    else
+        llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA);
+
+    // Gestion des droits de tracking de la camera
+    if (perm & PERMISSION_TRACK_CAMERA)
+        debug("PERMISSION_TRACK_CAMERA - Vous avez déjà les droit");
+    else
+        llRequestPermissions(llGetOwner(), PERMISSION_TRACK_CAMERA);
 }
 
 /* Permet de revoque rles droits de l'utilisateur */
@@ -69,19 +75,19 @@ deSynchro(integer perm)
 {
     if (perm & PERMISSION_CONTROL_CAMERA)
     {
-    	debug("deSynchro - révocation des droits");
-   	 	llSetCameraParams([CAMERA_ACTIVE, 0]);
-    	llClearCameraParams();
+        debug("deSynchro - révocation des droits");
+            llSetCameraParams([CAMERA_ACTIVE, 0]);
+        llClearCameraParams();
     }
-    else 
-    	debug("deSynchro - Droit déjà révoqués");
-    couleur(infoSynchro, couleur_rouge);    
+    else
+        debug("deSynchro - Droit déjà révoqués");
+    couleur(infoSynchro, couleur_rouge);
 }
 
 /* --- Couleur -- */
 couleur(integer prims, vector couleur)
 {
-	llSetLinkPrimitiveParams(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
+    llSetLinkPrimitiveParams(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
 }
 
 testCamera(integer perms)
@@ -100,6 +106,14 @@ testCamera2(integer perms)
     }
 }
 
+getCameraPosition(integer perm)
+{
+	vector cam_position = llGetCameraPos();
+	rotation cam_rotation = llGetCameraRot();
+	
+	debug("Position de la camera : " + (string) cam_position + " Rotatation de la camera : " + (string) cam_rotation);
+}
+
 
 default
 {
@@ -113,8 +127,8 @@ default
     {
         integer touchedButton = llDetectedLinkNumber(0);
         integer perm = llGetPermissions();
-
-        //debug("Touched -" + (string) touchedButton);
+        if(getToutchedPrim)
+            debug("Touched -" + (string) touchedButton);
         if (touchedButton == boutonSynchro)// --------------Synchro
         {
             synchro(perm);
@@ -130,7 +144,11 @@ default
         }
         else if (touchedButton == boutonTesCam2)// ------- cam 2
         {
-        	testCamera2(perm);
+            testCamera2(perm);
+        }
+        else if (touchedButton == boutonGetCameraPosition)
+        {
+        	getCameraPosition(perm);
         }
     }
      run_time_permissions(integer perm)
@@ -138,12 +156,12 @@ default
         if(perm & PERMISSION_CONTROL_CAMERA)
         {
              debug("run_time_permissions - PERMISSION_CONTROL_CAMERA : OK"+(string) perm);
-             couleur(infoSynchro, couleur_vert);
+             couleur(infoSynchro, couleur_bleu);
         }
         if (perm & PERMISSION_TRACK_CAMERA)
         {
-        	debug("run_time_permissions - PERMISSION_TRACK_CAMERA : OK"+(string) perm);
-        	couleur(infoSynchro, couleur_vert);
+            debug("run_time_permissions - PERMISSION_TRACK_CAMERA : OK"+(string) perm);
+            couleur(infoSynchro, couleur_bleu);
         }
     }
 }
