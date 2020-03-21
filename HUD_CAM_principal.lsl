@@ -176,10 +176,9 @@ default
         integer perm = llGetPermissions();
         if(getToutchedPrim)
             debug("Touched -" + (string) touchedButton);
+            
         if (touchedButton == boutonSynchro)// --------------Synchro
-        {
             synchro(perm);
-        }
         else if (touchedButton == boutonDeSyncrho)// ------Désynchro
         {
             deSynchro(perm);
