@@ -1,43 +1,94 @@
-// ======================================================
-// Constantes
-// ======================================================
-    integer modeDebug = TRUE;
-    integer modeInfo = TRUE;
-    integer getToutchedPrim = FALSE;
-    // -- Identifiant des boutons
-    // Synchro on
-    integer boutonSynchro = 24;
-    integer boutonDeSyncrho = 29;
-    integer boutonTestCam = 25;
-    integer boutonGetCameraPosition = 22;
-    integer boutonTesCam2 = 27;
-    integer infoSynchro = 28;
+// ######################################################################################
+//               Gestion des Camera - HUD Assistant
+// ######################################################################################
+/* 
+Ce hud est utilisé par l'assistant, il lui permet de se synchroniser sur les camera et de prendre le controle du Hud Camera 
+ - (A faire) Permet à l'operateur de tester les plans de cadrages disponnibles
+ - (A faire)Permet à l'operateur d'envoyer un plan au cadreur
+ - (A faire) Permet à l'opérateur de cadrer des plans fixes et de les envoyer à l'opérateur
+ - (A faire) permet à l'opérateur de faire des plans movible de 10 secondes
+*/
 
-    // -- vues :
-    vector offsetCamera = <1.0000,0.0000,0.0000>;
-    // - Camera 1
-    vector cam_1_position = <222.45987, 80.80021, 29.07231>;
-    rotation cam_1_rotation =  <0.05568, 0.33002, -0.15678, 0.92920>;
-
-    // - Camera 2
-    vector cam_2_position = <239.90578, 72.87510, 21.77446>;
-    rotation cam_2_rotation =  <-0.05836, 0.07662, 0.60313, 0.79180>;
-
-
-    // Couleur
-    vector couleur_bleu = <0.000, 0.455, 0.851>;
-    vector couleur_rouge = <1.000, 0.255, 0.212>;
-    vector couleur_vert = <0.180, 0.800, 0.251> ;
-
-
-// - debug
+// --------------------------------------------
+//               Debug et test
+// -------------------------------------------
+integer modeDebug = TRUE;
+integer modeInfo = TRUE;
+integer getToutchedPrim = FALSE;
+    
+/* Fonction de Debug */
 debug(string message)
 {
     if (modeDebug = TRUE)
     {
         llOwnerSay("/me [Debug] - " + message);
     }
+
 }
+
+/* Fonction d'information */
+
+
+// --------------------------------------------
+//                Constantes
+// -------------------------------------------
+
+/*         ------   Boutons    ------               */
+// Permissions
+integer boutonSynchro = 24;
+integer boutonDeSyncrho = 29;
+
+// Camera
+integer cam0_bouton; 
+integer cam1_bouton;
+integer cam2_bouton;
+integer cam3_bouton;
+integer cam4_bouton;
+integer cam5_bouton;
+integer cam6_bouton;
+integer cam7_bouton;
+integer cam8_bouton;
+integer cam9_bouton;
+
+integer boutonTestCam = 25;
+integer boutonGetCameraPosition = 22;
+integer boutonTesCam2 = 27;
+integer infoSynchro = 28;
+
+integer camInfoUpdate = 19;
+integer camSendId ;
+
+/*         ------   Camera    ------               */
+// Gestion de l'offset
+vector offsetCamera = <1.0000,0.0000,0.0000>;
+
+// Mémoire
+// - Camera 1
+vector cam_1_position = <222.45987, 80.80021, 29.07231>;
+rotation cam_1_rotation =  <0.05568, 0.33002, -0.15678, 0.92920>;
+
+// - Camera 2
+vector cam_2_position = <239.90578, 72.87510, 21.77446>;
+rotation cam_2_rotation =  <-0.05836, 0.07662, 0.60313, 0.79180>;
+
+// Lis de mémoires
+list cam0_param;
+list cam1_param;
+list cam2_param;
+list cam3_param;
+list cam4_param;
+list cam5_param;
+list cam6_param;
+list cam7_param;
+list cam8_param;
+list cam9_param;
+
+integer cam_curent;
+
+/*         ------   Couleurs    ------               */
+vector couleur_bleu = <0.000, 0.455, 0.851>;
+vector couleur_rouge = <1.000, 0.255, 0.212>;
+vector couleur_vert = <0.180, 0.800, 0.251> ;
 
 info(string message)
 {
@@ -48,54 +99,41 @@ info(string message)
     }
 }
 
-// =============================================
-// Fonction
-// =============================================
+// --------------------------------------------
+//                Fonctions
+// -------------------------------------------
 
-// Resset
-/* Fonction qui permet de réinitilialise rl'affichage
-*/
-reset()
-{
-     couleur(infoSynchro, couleur_rouge);
-}
+/*         ------   Droits    ------               */
 
-// --------------- Synchro
-/* Fonction qui permet de donner les droits de la caméra au HD */
-synchro(integer perm)
+/* Donne les droits au controle de la camera */
+DroitCameraOn(integer perm)
 {
-    // Gestion des droits de la camera
-    if (perm & PERMISSION_CONTROL_CAMERA)
-        debug("PERMISSION_CONTROL_CAMERA - Vous avez déjà les droit");
-    else
+    // Si pas de droit
+    if (!(perm & PERMISSION_CONTROL_CAMERA))
         llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA);
-
-    // Gestion des droits de tracking de la camera
-    if (perm & PERMISSION_TRACK_CAMERA)
-        debug("PERMISSION_TRACK_CAMERA - Vous avez déjà les droit");
-    else
-        llRequestPermissions(llGetOwner(), PERMISSION_TRACK_CAMERA);
+	couleur(infoSynchro, couleur_bleu);
 }
 
 /* Permet de revoque rles droits de l'utilisateur */
-deSynchro(integer perm)
+DroitCameraOff(integer perm)
 {
+	// Si il y a des droits de donnés
     if (perm & PERMISSION_CONTROL_CAMERA)
     {
         debug("deSynchro - révocation des droits");
-           llSetCameraParams([CAMERA_ACTIVE, 0]);
+        llSetCameraParams([CAMERA_ACTIVE, 0]);
         llClearCameraParams();
     }
-    else
-        debug("deSynchro - Droit déjà révoqués");
     couleur(infoSynchro, couleur_rouge);
 }
 
-/* --- Couleur -- */
+/*         ------   Affichage    ------               */
+/*  Gestion de la couleu des prims */
 couleur(integer prims, vector couleur)
 {
     llSetLinkPrimitiveParams(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
 }
+
 
 vector convertionFocus(vector position, rotation camera)
 {
@@ -153,21 +191,12 @@ testCamera2(integer perms)
     }
 }
 
-getCameraPosition(integer perm)
-{
-    vector cam_position = llGetCameraPos();
-    rotation cam_rotation = llGetCameraRot();
-
-    debug("Position de la camera : " + (string) cam_position + " Rotatation de la camera : " + (string) cam_rotation);
-}
-
 
 default
 {
     state_entry()
     {
         info("Reset - script");
-        reset();
     }
 
     touch_start(integer total_number)
@@ -176,38 +205,42 @@ default
         integer perm = llGetPermissions();
         if(getToutchedPrim)
             debug("Touched -" + (string) touchedButton);
-            
-        if (touchedButton == boutonSynchro)// --------------Synchro
-            synchro(perm);
+         
+        /*         ---- Droit ---            */
+        // Camera On
+        if (touchedButton == boutonSynchro)
+            DroitCameraOn(perm);
+        // Camera off
         else if (touchedButton == boutonDeSyncrho)// ------Désynchro
-        {
-            deSynchro(perm);
-
-        }
-        else if (touchedButton == boutonTestCam) // ------Cam 1
-        {
+            DroitCameraOff(perm);
+        /*         ---- Camera ---          */   
+        // Camera 1 
+        else if (touchedButton == boutonTestCam)
             testCamera(perm);
-        }
-        else if (touchedButton == boutonTesCam2)// ------- cam 2
-        {
+        // Camera 2 
+        else if (touchedButton == boutonTesCam2)
             testCamera2(perm);
-        }
-        else if (touchedButton == boutonGetCameraPosition)
-        {
-            getCameraPosition(perm);
-        }
+		else if(touchedButton == camInfoUpdate)
+			appelInfoUpdate();
     }
      run_time_permissions(integer perm)
     {
         if(perm & PERMISSION_CONTROL_CAMERA)
         {
-             debug("run_time_permissions - PERMISSION_CONTROL_CAMERA : OK"+(string) perm);
              couleur(infoSynchro, couleur_bleu);
         }
         if (perm & PERMISSION_TRACK_CAMERA)
         {
-            debug("run_time_permissions - PERMISSION_TRACK_CAMERA : OK"+(string) perm);
             couleur(infoSynchro, couleur_bleu);
         }
     }
 }
+
+
+/*getCameraPosition(integer perm)
+{
+    vector cam_position = llGetCameraPos();
+    rotation cam_rotation = llGetCameraRot();
+
+    debug("Position de la camera : " + (string) cam_position + " Rotatation de la camera : " + (string) cam_rotation);
+}*/
