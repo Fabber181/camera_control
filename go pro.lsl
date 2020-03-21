@@ -48,7 +48,7 @@ updateNumber()
 
 infoPositionRotation()
 {
-   llShout(channel, "CAM_001_GIV_INFO P1 " + (string) llGetPos() + " R1 " + (string) llGetRot());
+   llShout(channel, "CAM_"+indexCamCom+"_GIV_INFO P1 " + (string) llGetPos() + "                     R1 " + (string) llGetRot());
 }
 
 default
