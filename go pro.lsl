@@ -22,25 +22,33 @@ list nombre =
      0.23071,//8
      0.33081];//9
 integer indexCam;
+string indexCamCom;
 integer indexCamMax = 9;
 integer indexCamMin = 0;
+integer channel = 2830;
 
 // Propriete
 string INSTANCE_ALL = "ALL";
 string ACTOIN_GET_INFO = "GET_INFO";
 string ACTION_SET_INFO= "SET_INFO";
+string ACTION_FIV_INFO= "GIV_INFO";
 
 // ##########################################
 // Fonctions
 // #########################################
 updateNumber()
 {
+	if(indexCam <10)
+		indexCamCom = "00"+ (string) indexCam;
+	else if (indexCam>=10)
+		indexCamCom = "0"+ (string) indexCam;
+	llOwnerSay("indexCamCom : " + (string) indexCamCom);
     llSetLinkPrimitiveParams( 3, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, indexCam), 0.19999, 0.0>, 0 ]);
 }
 
 infoPositionRotation()
 {
-    
+   llShout(channel, "CAM_001_GIV_INFO P1 " + (string) llGetPos() + " R1 " + (string) llGetRot());
 }
 
 default
@@ -49,7 +57,7 @@ default
     {
         indexCam = 0;
         updateNumber();
-        llListen(2830, "", NULL_KEY, "");
+        llListen(channel, "", NULL_KEY, "");
     }
     touch_start(integer num_detected)
     {
@@ -78,11 +86,15 @@ default
     {
     	//Décompilation du message
 		string instance = llGetSubString(message, 4 , 6);
-		string instancePropriete = llGetSubString(message, 4 , 6);
+		string instancePropriete = llGetSubString(message, 8 , 16);
 		
 		// Si concerne tous
-		if (instance == "ALL")
-		{
+		if (instance == INSTANCE_ALL)
+		{	
+			if(instancePropriete == ACTOIN_GET_INFO)
+			{
+				infoPositionRotation();
+			}
 		}
 		else
 		{
