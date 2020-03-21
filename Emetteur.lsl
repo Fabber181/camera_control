@@ -3,7 +3,7 @@
 // ======================================================
     integer modeDebug = TRUE;
     integer modeInfo = TRUE;
-    integer getToutchedPrim = TRUE; 
+    integer getToutchedPrim = FALSE; 
     // -- Identifiant des boutons
     // Synchro on
     integer boutonSynchro = 24;
@@ -14,8 +14,14 @@
     integer infoSynchro = 28;
     
     // -- vues : 
-    vector cam-1_position = <0.0,0.0,0.0>;
-    vector cam_1_rotation = <0.0,0.0,0.0>;
+    // - Camera 1
+    vector cam_1_position = <240.20906, 72.57046, 26.38088>;
+    rotation cam_1_rotation = <-0.45480, 0.02716, 0.88860, 0.05307>;
+    
+    // - Camera 2
+    vector cam_2_position = <225.32430, 69.60304, 21.15176>;
+    rotation cam_2_rotation =  <-0.01418, 0.03966, 0.33636, 0.94079>;
+    
 
     // Couleur
     vector couleur_bleu = <0.000, 0.455, 0.851>;
@@ -76,7 +82,7 @@ deSynchro(integer perm)
     if (perm & PERMISSION_CONTROL_CAMERA)
     {
         debug("deSynchro - révocation des droits");
-            llSetCameraParams([CAMERA_ACTIVE, 0]);
+           llSetCameraParams([CAMERA_ACTIVE, 0]);
         llClearCameraParams();
     }
     else
@@ -94,7 +100,24 @@ testCamera(integer perms)
 {
     if ( perms & PERMISSION_CONTROL_CAMERA )
     {
-            debug(" fonction  testCamera - Droit valides");
+		debug(" fonction  testCamera - Droit valides");
+		 llSetCameraParams([
+        CAMERA_ACTIVE, 1, // 1 is active, 0 is inactive
+        CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
+        CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
+        CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
+        CAMERA_FOCUS, cam_1_position, // region relative position
+        CAMERA_FOCUS_LAG, 0.0 , // (0 to 3) seconds
+        CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
+        CAMERA_FOCUS_THRESHOLD, 0.0, // (0 to 4) meters
+		//CAMERA_PITCH, 80.0, // (-45 to 80) degrees
+        CAMERA_POSITION, cam_1_position + <4.0,4.0,4.0>, // region relative position
+        CAMERA_POSITION_LAG, 0.0, // (0 to 3) seconds
+        CAMERA_POSITION_LOCKED, TRUE, // (TRUE or FALSE)
+        CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
+        CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
+    	]);
+	
     }
 }
 
@@ -102,7 +125,23 @@ testCamera2(integer perms)
 {
     if ( perms & PERMISSION_CONTROL_CAMERA)
     {
-             debug(" fonction  testCamera 2 - Droit valides");
+    	debug(" fonction  testCamera 2 - Droit valides");
+    	 llSetCameraParams([
+        CAMERA_ACTIVE, 1, // 1 is active, 0 is inactive
+        CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
+        CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
+        CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
+        CAMERA_FOCUS, cam_2_position, // region relative position
+        CAMERA_FOCUS_LAG, 0.0 , // (0 to 3) seconds
+        CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
+        CAMERA_FOCUS_THRESHOLD, 0.0, // (0 to 4) meters
+		//CAMERA_PITCH, 80.0, // (-45 to 80) degrees
+        CAMERA_POSITION, cam_2_position + <4.0,4.0,4.0>, // region relative position
+        CAMERA_POSITION_LAG, 0.0, // (0 to 3) seconds
+        CAMERA_POSITION_LOCKED, TRUE, // (TRUE or FALSE)
+        CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
+        CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
+        ]);
     }
 }
 
