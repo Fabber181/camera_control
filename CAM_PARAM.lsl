@@ -13,7 +13,7 @@ Script destiné au caméra in world. Il permet de faire plusieurs choses :
 // --------------------------------------------
 //               Debug et test
 // -------------------------------------------
-integer modeDebug = TRUE;
+integer modeDebug = FALSE;
 integer modeDebugTouch = FALSE;
 
 /* Fonction de debug si activé */
@@ -92,13 +92,14 @@ setNouvelleCoordonnees(string message)
 {
     // Lecture des coorodonées
     vector pos = (vector) llGetSubString(message, 20 , 59);
-    integer rot = llSubStringIndex(message, "R1") + 3;
+    integer debutAngle = llSubStringIndex(message, "R1") + 3;
+    rotation rot = (rotation) llGetSubString(message, debutAngle , debutAngle+ 60);
     debug("setNouvelleCoordonnees() | POS : "+ (string) pos  + " Rot : " +(string) rot ) ;
 
 
     // Mise en place des nouvelles coordonées
-    //llSetRot(rot);
-    //llSetPos(pos);
+    llSetRot(rot);
+   llSetPos(pos);
 
 }
 
@@ -141,8 +142,7 @@ default
     {
         //Décompilation du message
         string instance = llGetSubString(message, 4 , 6);
-        string instancePropriete = llGetSubString(message, 8 , 16);
-    
+        string instancePropriete = llGetSubString(message, 8 , 15);
 
         // Si concerne tous
         if (instance == INSTANCE_ALL)
@@ -155,12 +155,11 @@ default
         {
             // Récupération de l'idenfitiant de la cam
             integer instanceIdCam = (integer)instance;
-            debug("instance ID Cam : " + (string) instanceIdCam + " Action : " + (string) instancePropriete + " Attendu : " + (string) ACTION_SET_INFO ;
-            
-               // Si correspond
+            debug("instance ID Cam : " + (string) instanceIdCam + " Action : " + (string) instancePropriete + " Attendu : " + (string) ACTION_SET_INFO) ;
+
+            // Si l'ID de la camera correspond
             if ((integer) instanceIdCam == indexCam)
             {
-            	debug("Ca rentre");
                 // Si mise à jours des informations
                 if(instancePropriete == ACTION_SET_INFO)
                 {
