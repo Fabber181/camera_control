@@ -29,7 +29,7 @@ float MOVERATE=0.5;
 // used by these controls: rotate left, rotate right
 // lower is slower/smoother, higher is faster/jumpier
 // also a good idea to have this number divide 360 evenly
-float SPINRATE=6.0;
+float SPINRATE=0.2;
 
 // The above MOVERATE/SPINRATE will be multiplied by their corresponding
 // LFACTOR while the left mouse button is held down

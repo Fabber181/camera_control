@@ -14,6 +14,7 @@
     integer infoSynchro = 28;
     
     // -- vues : 
+    vector offsetCamera = <1.0000,0.0000,0.0000>;
     // - Camera 1
     vector cam_1_position = <240.20906, 72.57046, 26.38088>;
     rotation cam_1_rotation = <-0.45480, 0.02716, 0.88860, 0.05307>;
@@ -25,7 +26,7 @@
 
     // Couleur
     vector couleur_bleu = <0.000, 0.455, 0.851>;
-    vector couleur_rouge =     <1.000, 0.255, 0.212>;
+    vector couleur_rouge = <1.000, 0.255, 0.212>;
     vector couleur_vert = <0.180, 0.800, 0.251> ;
 
 
@@ -96,6 +97,13 @@ couleur(integer prims, vector couleur)
     llSetLinkPrimitiveParams(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
 }
 
+vector convertionFocus(vector position, rotation camera)
+{
+	vector rot=llRot2Euler(camera);
+	camera = llEuler2Rot(rot);
+	return position + offsetCamera*camera;
+}
+
 testCamera(integer perms)
 {
     if ( perms & PERMISSION_CONTROL_CAMERA )
@@ -106,12 +114,12 @@ testCamera(integer perms)
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
         CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
         CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
-        CAMERA_FOCUS, cam_1_position, // region relative position
+        CAMERA_FOCUS, convertionFocus(cam_1_position, cam_1_rotation), // region relative position
         CAMERA_FOCUS_LAG, 0.0 , // (0 to 3) seconds
         CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
         CAMERA_FOCUS_THRESHOLD, 0.0, // (0 to 4) meters
 		//CAMERA_PITCH, 80.0, // (-45 to 80) degrees
-        CAMERA_POSITION, cam_1_position + <4.0,4.0,4.0>, // region relative position
+        CAMERA_POSITION, cam_1_position, // region relative position
         CAMERA_POSITION_LAG, 0.0, // (0 to 3) seconds
         CAMERA_POSITION_LOCKED, TRUE, // (TRUE or FALSE)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
@@ -131,12 +139,12 @@ testCamera2(integer perms)
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
         CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
         CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
-        CAMERA_FOCUS, cam_2_position, // region relative position
+        CAMERA_FOCUS,  convertionFocus(cam_1_position, cam_1_rotation), // region relative position
         CAMERA_FOCUS_LAG, 0.0 , // (0 to 3) seconds
         CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
         CAMERA_FOCUS_THRESHOLD, 0.0, // (0 to 4) meters
 		//CAMERA_PITCH, 80.0, // (-45 to 80) degrees
-        CAMERA_POSITION, cam_2_position + <4.0,4.0,4.0>, // region relative position
+        CAMERA_POSITION, cam_2_position, // region relative position
         CAMERA_POSITION_LAG, 0.0, // (0 to 3) seconds
         CAMERA_POSITION_LOCKED, TRUE, // (TRUE or FALSE)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
