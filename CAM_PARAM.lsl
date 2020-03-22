@@ -13,7 +13,7 @@ Script destiné au caméra in world. Il permet de faire plusieurs choses :
 // --------------------------------------------
 //               Debug et test
 // -------------------------------------------
-integer modeDebug = FALSE;
+integer modeDebug = TRUE;
 integer modeDebugTouch = FALSE;
 
 /* Fonction de debug si activé */
@@ -30,16 +30,17 @@ debug(string message)
 // Indexation des caméra / com
 integer indexCam;
 string indexCamCom;
-integer indexCamMax = 9;
+integer indexCamMax = 20;
 integer indexCamMin = 0;
 integer channel = 2830;
 list nombre = [0.43999, -0.44998, -0.36989, -0.26979,-0.16967,-0.06959,0.03051,0.14062,0.23071, 0.33081];
 
 // Boutons
-integer boutonCam = 2;
+integer boutonCam = 4;
 integer faceCamPlus = 5;
 integer faceCamMoins = 1;
 integer primsLcd = 3;
+integer primxLcdDisaine = 2;
 
 // Constante de lectures
 string INSTANCE_ALL = "ALL";
@@ -58,10 +59,14 @@ updateLCD()
         indexCamCom = "00"+ (string) indexCam;
     else if (indexCam>=10)
         indexCamCom = "0"+ (string) indexCam;
-
+        
+    // calcul de la dizaine 
+    integer dizaine =(integer) llFloor(indexCam/10);
+    integer unite = indexCam - 10*dizaine;
 
     // Mise à jours du LCD
-    llSetLinkPrimitiveParams( primsLcd, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, indexCam), 0.19999, 0.0>, 0 ]);
+    llSetLinkPrimitiveParams( primsLcd, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, dizaine), 0.19999, 0.0>, 0 ]);
+    llSetLinkPrimitiveParams( primxLcdDisaine, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, unite), 0.19999, 0.0>, 0 ]);
 }
 
 /* -- Mise à jours si bouton plus -- */
@@ -85,8 +90,8 @@ identifiantCamMoins()
 /* -- Envois les informations de la camera -- */
 infoPositionRotation()
 {
-	llSleep(indexCam);
-	llShout(channel, "CAM_"+indexCamCom+"_GIV_INFO P1 " + (string) llGetPos() + "                     R1 " + (string) llGetRot());
+    llSleep(indexCam);
+    llShout(channel, "CAM_"+indexCamCom+"_GIV_INFO P1 " + (string) llGetPos() + "                     R1 " + (string) llGetRot());
 }
 
 setNouvelleCoordonnees(string message)
