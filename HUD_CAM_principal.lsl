@@ -59,6 +59,7 @@ string ACTION_GIV_INFO= "GIV_INFO";
 // Permissions
 integer boutonSynchro = 24;
 integer boutonDeSyncrho = 29;
+integer boutonManuelStatic = 15;
 
 // Camera
 integer cam0_bouton = 25; 
@@ -72,13 +73,12 @@ integer cam7_bouton= 23;
 integer cam8_bouton= 3;
 integer cam9_bouton= 16;
 
-integer boutonTestCam = 25;
-integer boutonGetCameraPosition = 22;
-integer boutonTesCam2 = 27;
+// Camera - Directe
 integer infoSynchro = 28;
+integer boutonInfoUpdate = 19;
 
-integer camInfoUpdate = 19;
-integer camSendId ;
+/*         ------------ Variables --------             */
+integer camSelectionne;
 
 /*         ------   Camera    ------               */
 // Mémoire
@@ -121,7 +121,6 @@ vector couleur_blanc=	<1.000, 1.000, 1.000>;
 DroitCameraOn(integer perm)
 {
     // Si pas de droit
-    if (!(perm & PERMISSION_CONTROL_CAMERA))
         llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA);
     couleur(infoSynchro, couleur_bleu);
 }
@@ -236,7 +235,7 @@ recupereInformation(string message)
 }
 
 
-/*            ---- Camera -------       */
+/*            ---- Camera  | Programmé -------       */
 
 
 // Charge la position de la caméra
@@ -264,13 +263,26 @@ updateCamera(list parametre, integer bouton)
         ]);
 }
 
-/* -- COnvertion de rotation en focus -- */
+/* -- Convertion de rotation en focus -- */
 vector convertionFocus(vector position, rotation camera)
 {
     vector rot=llRot2Euler(camera);
     camera = llEuler2Rot(rot);
     return position + offsetCamera*camera;
 }
+
+
+
+/*            ---- Camera | Manual ---              */
+// Envoie la coordoné de la camera au bot sous la forme standard. 
+sendCameraStaticManual()
+{
+	string coo =  "CAM_201_"+ ACTION_SET_INFO +" P1 " + (string) llGetCameraPos() + "                     R1 " + (string) llGetCameraRot();
+	debug(coo);
+}
+
+
+
 default
 {
     
@@ -296,9 +308,9 @@ default
         else if (touchedButton == boutonDeSyncrho)// ------Désynchro
             DroitCameraOff(perm); 
         /*         ---- Camera ---          */   
-        else if(touchedButton == camInfoUpdate)
+        else if(touchedButton == boutonInfoUpdate)
             appelInfoUpdate();
-        if(touchedButton == cam0_bouton)
+        else if(touchedButton == cam0_bouton)
 			updateCamera(cam0_param, cam0_bouton);
 		else if (touchedButton == cam1_bouton)
 			updateCamera(cam1_param, cam1_bouton);
@@ -320,7 +332,10 @@ default
 			updateCamera(cam8_param, cam8_bouton);
 		else if (touchedButton == cam9_bouton)
 			updateCamera(cam9_param, cam9_bouton);
-    }
+		/*         ----- Manuelle -------         */
+		else if (touchedButton == boutonManuelStatic)
+			sendCameraStaticManual();
+}
     
     
      run_time_permissions(integer perm)
@@ -328,10 +343,12 @@ default
         if(perm & PERMISSION_CONTROL_CAMERA)
         {
              couleur(infoSynchro, couleur_bleu);
+             llOwnerSay("Camera Ouvert");
         }
         if (perm & PERMISSION_TRACK_CAMERA)
         {
             couleur(infoSynchro, couleur_bleu);
+            llOwnerSay("tracking ouvert");
         }
     }
     
