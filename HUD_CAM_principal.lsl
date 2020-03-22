@@ -61,10 +61,10 @@ integer boutonSynchro = 24;
 integer boutonDeSyncrho = 29;
 
 // Camera
-integer cam0_bouton; 
-integer cam1_bouton;
-integer cam2_bouton;
-integer cam3_bouton;
+integer cam0_bouton = 2; 
+integer cam1_bouton = 5;
+integer cam2_bouton = 7;
+integer cam3_bouton= 11;
 integer cam4_bouton;
 integer cam5_bouton;
 integer cam6_bouton;
@@ -181,61 +181,35 @@ recupereInformation(string message)
 	else if(indexCamera == 2)
 		cam2_param= [pos, rot]; 
 }
-/*        ---- Camera -------     */
+
+
+/*            ---- Camera -------       */
+
+
 // Charge la position de la caméra
-
-// Extraction indentifiant camera;
-
-testCamera(integer perms)
+updateCamera(list parametre)
 {
-    if ( perms & PERMISSION_CONTROL_CAMERA )
-    {
-        debug(" fonction  testCamera - Droit valides");
-         llSetCameraParams([
+	vector pos = llList2Vector(parametre,0);
+	rotation rot = llList2Rot(parametre,1);
+	
+	llOwnerSay("UpdateCamera() - Position " +(string) pos + " rotation : "+(string) rot );
+	 llSetCameraParams([
         CAMERA_ACTIVE, 1, // 1 is active, 0 is inactive
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
         CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
         CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
-        CAMERA_FOCUS, convertionFocus(cam_1_position, cam_1_rotation), // region relative position
+        CAMERA_FOCUS, convertionFocus(pos, rot), // region relative position
         CAMERA_FOCUS_LAG, 0.0 , // (0 to 3) seconds
         CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
         CAMERA_FOCUS_THRESHOLD, 0.0, // (0 to 4) meters
         //CAMERA_PITCH, 80.0, // (-45 to 80) degrees
-        CAMERA_POSITION, cam_1_position, // region relative position
+        CAMERA_POSITION, pos, // region relative position
         CAMERA_POSITION_LAG, 0.0, // (0 to 3) seconds
         CAMERA_POSITION_LOCKED, TRUE, // (TRUE or FALSE)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
         CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
         ]);
-
-    }
 }
-
-testCamera2(integer perms)
-{
-    if ( perms & PERMISSION_CONTROL_CAMERA)
-    {
-        debug(" fonction  testCamera 2 - Droit valides");
-         llSetCameraParams([
-        CAMERA_ACTIVE, 1, // 1 is active, 0 is inactive
-        CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
-        CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
-        CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
-        CAMERA_FOCUS,  convertionFocus(cam_2_position, cam_2_rotation), // region relative position
-        CAMERA_FOCUS_LAG, 0.0 , // (0 to 3) seconds
-        CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
-        CAMERA_FOCUS_THRESHOLD, 0.0, // (0 to 4) meters
-        //CAMERA_PITCH, 80.0, // (-45 to 80) degrees
-        CAMERA_POSITION, cam_2_position, // region relative position
-        CAMERA_POSITION_LAG, 0.0, // (0 to 3) seconds
-        CAMERA_POSITION_LOCKED, TRUE, // (TRUE or FALSE)
-        CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
-        CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
-        ]);
-    }
-}
-
-
 default
 {
     
@@ -259,15 +233,23 @@ default
         // Camera off
         else if (touchedButton == boutonDeSyncrho)// ------Désynchro
             DroitCameraOff(perm);
+            
         /*         ---- Camera ---          */   
-        // Camera 1 
+        // Camera 1 OLD
         else if (touchedButton == boutonTestCam)
             testCamera(perm);
-        // Camera 2 
+        // Camera 2 OLD
         else if (touchedButton == boutonTesCam2)
             testCamera2(perm);
         else if(touchedButton == camInfoUpdate)
             appelInfoUpdate();
+            
+        if(touchedButton == cam0_bouton)
+			updateCamera(cam0_param);
+		else if (touchedButton == cam1_bouton)
+			updateCamera(cam1_param);
+		else if (touchedButton == cam2_bouton)
+			updateCamera(cam2_param);
     }
     
     
