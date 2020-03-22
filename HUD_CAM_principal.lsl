@@ -61,16 +61,16 @@ integer boutonSynchro = 24;
 integer boutonDeSyncrho = 29;
 
 // Camera
-integer cam0_bouton = 2; 
-integer cam1_bouton = 5;
-integer cam2_bouton = 7;
-integer cam3_bouton= 11;
-integer cam4_bouton;
-integer cam5_bouton;
-integer cam6_bouton;
-integer cam7_bouton;
-integer cam8_bouton;
-integer cam9_bouton;
+integer cam0_bouton = 25; 
+integer cam1_bouton = 27;
+integer cam2_bouton = 26;
+integer cam3_bouton= 21;
+integer cam4_bouton= 14;
+integer cam5_bouton= 6;
+integer cam6_bouton= 12;
+integer cam7_bouton= 23;
+integer cam8_bouton= 3;
+integer cam9_bouton= 16;
 
 integer boutonTestCam = 25;
 integer boutonGetCameraPosition = 22;
@@ -107,7 +107,9 @@ integer cam_curent;
 /*         ------   Couleurs    ------               */
 vector couleur_bleu = <0.000, 0.455, 0.851>;
 vector couleur_rouge = <1.000, 0.255, 0.212>;
+vector couleur_orange= 	<1.000, 0.522, 0.106>;
 vector couleur_vert = <0.180, 0.800, 0.251> ;
+vector couleur_blanc=	<1.000, 1.000, 1.000>;
 
 // --------------------------------------------
 //                Fonctions
@@ -144,19 +146,26 @@ couleur(integer prims, vector couleur)
     llSetLinkPrimitiveParams(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
 }
 
-/* -- COnvertion de rotation en focus -- */
-vector convertionFocus(vector position, rotation camera)
+// Passe les couleurs des caméra en blanc 
+resetCouleurCamera()
 {
-    vector rot=llRot2Euler(camera);
-    camera = llEuler2Rot(rot);
-    return position + offsetCamera*camera;
+	couleur(cam0_bouton, couleur_blanc);
+	couleur(cam1_bouton, couleur_blanc);
+	couleur(cam2_bouton, couleur_blanc);
+	couleur(cam3_bouton, couleur_blanc);
+	couleur(cam4_bouton, couleur_blanc);
+	couleur(cam5_bouton, couleur_blanc);
+	couleur(cam6_bouton, couleur_blanc);
+	couleur(cam7_bouton, couleur_blanc);
+	couleur(cam8_bouton, couleur_blanc);
+	couleur(cam9_bouton, couleur_blanc);
 }
-
 /*         ------ Donnée -----           */
 // Appel les caméra à se mètre à jours
 appelInfoUpdate()
 {
     llShout(channel, "CAM_" + INSTANCE_ALL + "_" + ACTION_GET_INFO);
+    resetCouleurCamera();
 }
 
 // Récuperation des informations
@@ -175,11 +184,55 @@ recupereInformation(string message)
  		
 	// Gestion des caméra de 1 à 10
 	if(indexCamera == 0)
+	{
 		cam0_param = [pos, rot];
+		couleur(cam0_bouton, couleur_bleu);
+	}
 	else if(indexCamera == 1)
+	{
 		cam1_param = [pos, rot]; 
+		couleur(cam1_bouton, couleur_bleu);
+	}
 	else if(indexCamera == 2)
-		cam2_param= [pos, rot]; 
+	{
+		cam2_param= [pos, rot];
+		couleur(cam2_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 3)
+	{
+		cam3_param= [pos, rot];
+		couleur(cam3_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 4)
+	{
+		cam4_param= [pos, rot];
+		couleur(cam4_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 5)
+	{
+		cam5_param= [pos, rot];
+		couleur(cam5_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 6)
+	{
+		cam6_param= [pos, rot];
+		couleur(cam6_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 7)
+	{
+		cam7_param= [pos, rot];
+		couleur(cam7_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 8)
+	{
+		cam8_param= [pos, rot];
+		couleur(cam8_bouton, couleur_bleu);		
+	}
+		else if(indexCamera == 9)
+	{
+		cam9_param= [pos, rot];
+		couleur(cam9_bouton, couleur_bleu);		
+	}
 }
 
 
@@ -187,7 +240,7 @@ recupereInformation(string message)
 
 
 // Charge la position de la caméra
-updateCamera(list parametre)
+updateCamera(list parametre, integer bouton)
 {
 	vector pos = llList2Vector(parametre,0);
 	rotation rot = llList2Rot(parametre,1);
@@ -210,6 +263,14 @@ updateCamera(list parametre)
         CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
         ]);
 }
+
+/* -- COnvertion de rotation en focus -- */
+vector convertionFocus(vector position, rotation camera)
+{
+    vector rot=llRot2Euler(camera);
+    camera = llEuler2Rot(rot);
+    return position + offsetCamera*camera;
+}
 default
 {
     
@@ -217,6 +278,7 @@ default
     {
         info("Reset - script");
         llListen(channel, "", NULL_KEY, "");
+        resetCouleurCamera();
     }
 
     touch_start(integer total_number)
@@ -232,24 +294,32 @@ default
             DroitCameraOn(perm);
         // Camera off
         else if (touchedButton == boutonDeSyncrho)// ------Désynchro
-            DroitCameraOff(perm);
-            
+            DroitCameraOff(perm); 
         /*         ---- Camera ---          */   
-        // Camera 1 OLD
-        else if (touchedButton == boutonTestCam)
-            testCamera(perm);
-        // Camera 2 OLD
-        else if (touchedButton == boutonTesCam2)
-            testCamera2(perm);
         else if(touchedButton == camInfoUpdate)
             appelInfoUpdate();
-            
         if(touchedButton == cam0_bouton)
-			updateCamera(cam0_param);
+			updateCamera(cam0_param, cam0_bouton);
 		else if (touchedButton == cam1_bouton)
-			updateCamera(cam1_param);
+			updateCamera(cam1_param, cam1_bouton);
 		else if (touchedButton == cam2_bouton)
-			updateCamera(cam2_param);
+			updateCamera(cam2_param, cam2_bouton);
+		else if (touchedButton == cam2_bouton)
+			updateCamera(cam2_param, cam2_bouton);
+		else if (touchedButton == cam3_bouton)
+			updateCamera(cam3_param, cam3_bouton);
+		else if (touchedButton == cam4_bouton)
+			updateCamera(cam4_param, cam4_bouton);
+		else if (touchedButton == cam5_bouton)
+			updateCamera(cam5_param, cam5_bouton);
+		else if (touchedButton == cam6_bouton)
+			updateCamera(cam6_param, cam6_bouton);
+		else if (touchedButton == cam7_bouton)
+			updateCamera(cam7_param, cam7_bouton);
+		else if (touchedButton == cam8_bouton)
+			updateCamera(cam8_param, cam8_bouton);
+		else if (touchedButton == cam9_bouton)
+			updateCamera(cam9_param, cam9_bouton);
     }
     
     
