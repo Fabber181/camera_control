@@ -86,7 +86,7 @@ identifiantCamMoins()
 infoPositionRotation()
 {
 	llSleep(indexCam);
-   llShout(channel, "CAM_"+indexCamCom+"_GIV_INFO P1 " + (string) llGetPos() + "                     R1 " + (string) llGetRot());
+	llShout(channel, "CAM_"+indexCamCom+"_GIV_INFO P1 " + (string) llGetPos() + "                     R1 " + (string) llGetRot());
 }
 
 setNouvelleCoordonnees(string message)
@@ -113,6 +113,11 @@ setNouvelleCoordonnees(string message)
 //                 !!! Default !!!
 default
 {
+	on_rez(integer start_param)
+	{
+		llResetScript();
+	}
+	
     state_entry()
     {
         // initalisation du script
