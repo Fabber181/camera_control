@@ -44,6 +44,8 @@ info(string message)
 // Divers
 integer channel = 2830;
 vector offsetCamera = <1.0000,0.0000,0.0000>; // Calcul de l'offset
+integer camMouvementManuel = FALSE;
+integer iteration = 0;
 
 // Communication
 list comPositionIndexCamera = [4,6];
@@ -60,6 +62,7 @@ string ACTION_GIV_INFO= "GIV_INFO";
 integer boutonSynchro = 24;
 integer boutonDeSyncrho = 29;
 integer boutonManuelStatic = 15;
+integer boutonManuelMouvement = 4;
 
 // Camera
 integer cam0_bouton = 25; 
@@ -121,7 +124,7 @@ vector couleur_blanc=	<1.000, 1.000, 1.000>;
 DroitCameraOn(integer perm)
 {
     // Si pas de droit
-        llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA);
+    llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA | PERMISSION_TRACK_CAMERA);
     couleur(infoSynchro, couleur_bleu);
 }
 
@@ -281,6 +284,14 @@ sendCameraStaticManual()
 	debug(coo);
 }
 
+// envois des coordonées
+sendCameraMouvementManual()
+{
+	// Mise en place du timer
+	llSetTimerEvent(0.5);
+	// activation de la variable camMouvementManuel
+	camMouvementManuel = TRUE;
+}
 
 
 default
@@ -335,6 +346,8 @@ default
 		/*         ----- Manuelle -------         */
 		else if (touchedButton == boutonManuelStatic)
 			sendCameraStaticManual();
+		else if (touchedButton == boutonManuelMouvement)
+			sendCameraMouvementManual();
 }
     
     
@@ -361,6 +374,22 @@ default
         if(action == ACTION_GIV_INFO)
             recupereInformation(message);
     }
+    
+    
+	timer()
+	{
+		iteration += 1;
+		if(camMouvementManuel)
+		{
+			sendCameraStaticManual();
+			if(iteration>14)
+			{
+				llSetTimerEvent(0.0);
+				iteration = 0;
+				camMouvementManuel = FALSE;
+			}
+		}
+	}
 }
 
 
