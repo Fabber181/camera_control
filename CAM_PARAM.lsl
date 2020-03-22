@@ -85,6 +85,7 @@ identifiantCamMoins()
 /* -- Envois les informations de la camera -- */
 infoPositionRotation()
 {
+	llSleep(indexCam);
    llShout(channel, "CAM_"+indexCamCom+"_GIV_INFO P1 " + (string) llGetPos() + "                     R1 " + (string) llGetRot());
 }
 
