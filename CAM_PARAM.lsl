@@ -47,6 +47,8 @@ string INSTANCE_ALL = "ALL";
 string ACTOIN_GET_INFO = "GET_INFO";
 string ACTION_SET_INFO= "SET_INFO";
 string ACTION_FIV_INFO= "GIV_INFO";
+string ACTION_SHOW= "CAM_SHOW";
+string ACTION_HIDE= "CAM_HIDE";
 
 // --------------------------------------------
 //                  Fonctions
@@ -107,6 +109,19 @@ setNouvelleCoordonnees(string message)
     llSetRot(rot);
    llSetPos(pos);
 
+}
+
+/* ---       Visibilité des camera            ---- */
+// permet d'afficher la camera
+showCamera()
+{
+	llSetPrimitiveParams(LINK_SET [PRIM_COLOR, ALL_SIDES, <1.0,1.0,1.0>, 1.0]);
+}
+
+// Permet de cacher la camera
+hideCamera()
+{
+	llSetPrimitiveParams(LINK_SET [PRIM_COLOR, ALL_SIDES, <1.0,1.0,1.0>, 0.0]);
 }
 
 
@@ -173,9 +188,12 @@ default
             {
                 // Si mise à jours des informations
                 if(instancePropriete == ACTION_SET_INFO)
-                {
                     setNouvelleCoordonnees(message);
-                }
+                if(instancePropriete == ACTION_SHOW)
+					showCamera();
+				if(instancePropriete == ACTION_HIDE
+					hideCamera();
+                
             }
         }
     }
