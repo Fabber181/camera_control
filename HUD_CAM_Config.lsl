@@ -27,6 +27,7 @@ integer indexMax = 20 ;
 integer indexMin  = 0;
 integer channel = 2830;
 list nombre = [0.43999, -0.44998, -0.36989,-0.26979,-0.16967,-0.06959, 0.03051,0.14062,0.23071, 0.33081];
+integer disaineActuelle;
 
 // Gestion des boutons 
 integer boutonCamPlus = 9;
@@ -43,8 +44,8 @@ string INSTANCE_ALL = "ALL";
 string ACTOIN_GET_INFO = "GET_INFO";
 string ACTION_SET_INFO= "SET_INFO";
 string ACTION_FIV_INFO= "GIV_INFO";
-string ACTION_SHOW= "SHOW";
-string ACTION_HIDE= "HIDE";
+string ACTION_SHOW= "CAM_SHOW";
+string ACTION_HIDE= "CAM_HIDE";
 
 // -------------------------------
 //          Fonction 
@@ -63,8 +64,9 @@ updateLCD()
     integer unite = indexCam - 10*dizaine;
         
     // Mise à jours du LCD
-    llSetLinkPrimitiveParams( primsLcd, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, unite), 0.19999, 0.0>, 0 ]);
-    llSetLinkPrimitiveParams( primxLcdDisaine, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, dizaine), 0.19999, 0.0>, 0 ]);
+    llSetLinkPrimitiveParamsFast( primsLcd, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, unite), 0.19999, 0.0>, 0 ]);
+    if(disaineActuelle != dizaine || disaineActuelle == 0)
+    llSetLinkPrimitiveParamsFast( primxLcdDisaine, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, dizaine), 0.19999, 0.0>, 0 ]);
     
 }
 
@@ -127,6 +129,10 @@ cameraShow()
 
 default
 {
+	on_rez(integer start_param)
+	{
+		llResetScript();
+	}
     state_entry()
     {
         indexCam = 0;

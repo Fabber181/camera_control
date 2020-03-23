@@ -34,13 +34,14 @@ integer indexCamMax = 20;
 integer indexCamMin = 0;
 integer channel = 2830;
 list nombre = [0.43999, -0.44998, -0.36989, -0.26979,-0.16967,-0.06959,0.03051,0.14062,0.23071, 0.33081];
+integer dizaineActuelle =0;
 
 // Boutons
 integer boutonCam = 4;
 integer faceCamPlus = 5;
 integer faceCamMoins = 1;
-integer primsLcd = 3;
-integer primxLcdDisaine = 2;
+integer primsLcd = 2;
+integer primxLcdDisaine = 3;
 
 // Constante de lectures
 string INSTANCE_ALL = "ALL";
@@ -67,8 +68,12 @@ updateLCD()
     integer unite = indexCam - 10*dizaine;
 
     // Mise à jours du LCD
-    llSetLinkPrimitiveParams( primsLcd, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, dizaine), 0.19999, 0.0>, 0 ]);
-    llSetLinkPrimitiveParams( primxLcdDisaine, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, unite), 0.19999, 0.0>, 0 ]);
+    llSetLinkPrimitiveParamsFast( primsLcd, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, unite), 0.19999, 0.0>, 0 ]);
+    if(dizaine != dizaineActuelle)
+    {
+    	dizaineActuelle = dizaine;
+    	llSetLinkPrimitiveParamsFast( primxLcdDisaine, [ PRIM_TEXTURE, ALL_SIDES, "2b64590b-8827-a506-b50e-8dc272ae6af8", <0.1, 0.5, 0.0>, <llList2Float(nombre, dizaine), 0.19999, 0.0>, 0 ]);
+    }
 }
 
 /* -- Mise à jours si bouton plus -- */
@@ -115,13 +120,13 @@ setNouvelleCoordonnees(string message)
 // permet d'afficher la camera
 showCamera()
 {
-	llSetPrimitiveParams(LINK_SET [PRIM_COLOR, ALL_SIDES, <1.0,1.0,1.0>, 1.0]);
+	llSetLinkPrimitiveParams(LINK_SET ,[PRIM_COLOR, ALL_SIDES, <1.0,1.0,1.0>, 1.0]);
 }
 
 // Permet de cacher la camera
 hideCamera()
 {
-	llSetPrimitiveParams(LINK_SET [PRIM_COLOR, ALL_SIDES, <1.0,1.0,1.0>, 0.0]);
+	llSetLinkPrimitiveParams(LINK_SET ,[PRIM_COLOR, ALL_SIDES, <1.0,1.0,1.0>, 0.0]);
 }
 
 
@@ -191,9 +196,8 @@ default
                     setNouvelleCoordonnees(message);
                 if(instancePropriete == ACTION_SHOW)
 					showCamera();
-				if(instancePropriete == ACTION_HIDE
-					hideCamera();
-                
+				if(instancePropriete == ACTION_HIDE)
+					hideCamera();     
             }
         }
     }
