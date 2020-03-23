@@ -45,6 +45,8 @@ info(string message)
 integer channel = 2830;
 vector offsetCamera = <1.0000,0.0000,0.0000>; // Calcul de l'offset
 integer camMouvementManuel = FALSE;
+integer camFast = FALSE;
+integer camEnCours;
 integer iteration = 0;
 
 // Communication
@@ -56,6 +58,7 @@ string INSTANCE_ALL = "ALL";
 string ACTION_GET_INFO = "GET_INFO";
 string ACTION_SET_INFO= "SET_INFO";
 string ACTION_GIV_INFO= "GIV_INFO";
+string ACTION_SET_CAME= "SET_CAME";
 
 /*         ------   Boutons    ------               */
 // Permissions
@@ -75,10 +78,23 @@ integer cam6_bouton= 12;
 integer cam7_bouton= 23;
 integer cam8_bouton= 3;
 integer cam9_bouton= 16;
+integer cam10_bouton = 13; 
+integer cam11_bouton = 18;
+integer cam12_bouton = 2;
+integer cam13_bouton= 5;
+integer cam14_bouton= 17;
+integer cam15_bouton= 7;
+integer cam16_bouton= 11;
+integer cam17_bouton= 8;
+integer cam18_bouton= 9;
+integer cam19_bouton= 20;
+integer cam20_bouton= 22;
 
 // Camera - Directe
 integer infoSynchro = 28;
 integer boutonInfoUpdate = 19;
+integer boutonFast = 35;
+integer boutonSend = 10;
 
 /*         ------------ Variables --------             */
 integer camSelectionne;
@@ -104,6 +120,17 @@ list cam6_param;
 list cam7_param;
 list cam8_param;
 list cam9_param;
+list cam10_param;
+list cam11_param;
+list cam12_param;
+list cam13_param;
+list cam14_param;
+list cam15_param;
+list cam16_param;
+list cam17_param;
+list cam18_param;
+list cam19_param;
+list cam20_param;
 
 integer cam_curent;
 
@@ -145,7 +172,7 @@ DroitCameraOff(integer perm)
 /*  Gestion de la couleu des prims */
 couleur(integer prims, vector couleur)
 {
-    llSetLinkPrimitiveParams(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
+    llSetLinkPrimitiveParamsFast(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
 }
 
 // Passe les couleurs des caméra en blanc 
@@ -161,6 +188,19 @@ resetCouleurCamera()
 	couleur(cam7_bouton, couleur_blanc);
 	couleur(cam8_bouton, couleur_blanc);
 	couleur(cam9_bouton, couleur_blanc);
+	couleur(cam10_bouton, couleur_blanc);
+	couleur(cam11_bouton, couleur_blanc);
+	couleur(cam12_bouton, couleur_blanc);
+	couleur(cam13_bouton, couleur_blanc);
+	couleur(cam14_bouton, couleur_blanc);
+	couleur(cam15_bouton, couleur_blanc);
+	couleur(cam16_bouton, couleur_blanc);
+	couleur(cam17_bouton, couleur_blanc);
+	couleur(cam18_bouton, couleur_blanc);
+	couleur(cam19_bouton, couleur_blanc);
+	couleur(cam20_bouton, couleur_blanc);
+	
+	
 }
 /*         ------ Donnée -----           */
 // Appel les caméra à se mètre à jours
@@ -230,15 +270,67 @@ recupereInformation(string message)
 		cam8_param= [pos, rot];
 		couleur(cam8_bouton, couleur_bleu);		
 	}
-		else if(indexCamera == 9)
+	else if(indexCamera == 9)
 	{
 		cam9_param= [pos, rot];
 		couleur(cam9_bouton, couleur_bleu);		
 	}
+	else if(indexCamera == 10)
+	{
+		cam10_param= [pos, rot];
+		couleur(cam10_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 11)
+	{
+		cam11_param= [pos, rot];
+		couleur(cam11_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 12)
+	{
+		cam12_param= [pos, rot];
+		couleur(cam12_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 13)
+	{
+		cam13_param= [pos, rot];
+		couleur(cam13_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 14)
+	{
+		cam14_param= [pos, rot];
+		couleur(cam14_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 15)
+	{
+		cam15_param= [pos, rot];
+		couleur(cam15_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 16)
+	{
+		cam16_param= [pos, rot];
+		couleur(cam16_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 17)
+	{
+		cam17_param= [pos, rot];
+		couleur(cam17_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 18)
+	{
+		cam18_param= [pos, rot];
+		couleur(cam18_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 19)
+	{
+		cam19_param= [pos, rot];
+		couleur(cam19_bouton, couleur_bleu);		
+	}
+	else if(indexCamera == 20)
+	{
+		cam20_param= [pos, rot];
+		couleur(cam20_bouton, couleur_bleu);		
+	}
 }
-
-
-/*            ---- Camera  | Programmé -------       */
 
 
 // Charge la position de la caméra
@@ -293,6 +385,24 @@ sendCameraMouvementManual()
 	camMouvementManuel = TRUE;
 }
 
+/*            ---- Mode | différé ---              */
+// Gestion du bouton fast : Active le bouton send
+cameraFastMode()
+{
+		camFast = !camFast ;
+		debug("cam Fast" + (string)camFast);
+		if(camFast)
+			couleur(boutonFast, couleur_vert);
+		else
+			couleur(boutonFast, couleur_blanc);
+}
+
+// Si le bouton send ets pressé, on envois la 
+cameraSendInfo()
+{
+	
+}
+
 
 default
 {
@@ -343,11 +453,40 @@ default
 			updateCamera(cam8_param, cam8_bouton);
 		else if (touchedButton == cam9_bouton)
 			updateCamera(cam9_param, cam9_bouton);
-		/*         ----- Manuelle -------         */
+		else if (touchedButton == cam9_bouton)
+			updateCamera(cam9_param, cam9_bouton);
+		else if (touchedButton == cam10_bouton)
+			updateCamera(cam10_param, cam10_bouton);
+		else if (touchedButton == cam11_bouton)
+			updateCamera(cam11_param, cam11_bouton);
+		else if (touchedButton == cam12_bouton)
+			updateCamera(cam12_param, cam12_bouton);
+		else if (touchedButton == cam13_bouton)
+			updateCamera(cam13_param, cam13_bouton);
+		else if (touchedButton == cam14_bouton)
+			updateCamera(cam14_param, cam14_bouton);
+		else if (touchedButton == cam15_bouton)
+			updateCamera(cam15_param, cam15_bouton);
+		else if (touchedButton == cam16_bouton)
+			updateCamera(cam16_param, cam16_bouton);
+		else if (touchedButton == cam17_bouton)
+			updateCamera(cam17_param, cam17_bouton);
+		else if (touchedButton == cam18_bouton)
+			updateCamera(cam18_param, cam18_bouton);
+		else if (touchedButton == cam19_bouton)
+			updateCamera(cam19_param, cam19_bouton);
+		else if (touchedButton == cam20_bouton)
+			updateCamera(cam20_param, cam20_bouton);
+			
+		/*             ----- Manuelle -------                */
 		else if (touchedButton == boutonManuelStatic)
 			sendCameraStaticManual();
 		else if (touchedButton == boutonManuelMouvement)
 			sendCameraMouvementManual();
+			
+		/*         ------ Mode Directe - diff    -------      */
+		else if(touchedButton == boutonFast)
+			cameraFastMode();
 }
     
     
