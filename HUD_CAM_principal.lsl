@@ -68,6 +68,41 @@ integer boutonManuelStatic = 15;
 integer boutonManuelMouvement = 4;
 
 // Camera
+list BoutonCamera = [
+	0, 25, //Cam 0 
+	1, 27, //Cam 1 
+	2, 26, //Cam 2
+	3, 21, //Cam 3
+	4, 14, //Cam 4
+	5, 6,  //Cam 5
+	6, 12, //Cam 6
+	7, 23, //Cam 7
+	8, 3,  //Cam 8
+	9, 16, //Cam 9
+	10, 13,//Cam 10
+	11, 18,//Cam 11
+	12, 2, //Cam 12
+	13, 5, //Cam 13
+	14, 17,//Cam 14
+	15, 7, //Cam 15
+	16, 11,//Cam 16
+	17, 8, //Cam 17
+	18, 9, //Cam 18
+	19, 20,//Cam 19
+	20, 22];//Cam 20
+
+// Camera - Directe
+integer infoSynchro = 28;
+integer boutonInfoUpdate = 19;
+integer boutonFast = 35;
+integer boutonSend = 10;
+
+/*         ------------ Variables --------             */
+integer camSelectionne;
+
+/*         ------   Camera    ------               */
+// Mémoire
+// Camera - OLD
 integer cam0_bouton = 25; 
 integer cam1_bouton = 27;
 integer cam2_bouton = 26;
@@ -89,26 +124,6 @@ integer cam17_bouton= 8;
 integer cam18_bouton= 9;
 integer cam19_bouton= 20;
 integer cam20_bouton= 22;
-
-// Camera - Directe
-integer infoSynchro = 28;
-integer boutonInfoUpdate = 19;
-integer boutonFast = 35;
-integer boutonSend = 10;
-
-/*         ------------ Variables --------             */
-integer camSelectionne;
-
-/*         ------   Camera    ------               */
-// Mémoire
-// - Camera 1
-vector cam_1_position = <222.45987, 80.80021, 29.07231>;
-rotation cam_1_rotation =  <0.05568, 0.33002, -0.15678, 0.92920>;
-
-// - Camera 2
-vector cam_2_position = <239.90578, 72.87510, 21.77446>;
-rotation cam_2_rotation =  <-0.05836, 0.07662, 0.60313, 0.79180>;
-
 // Lis de mémoires
 list cam0_param;
 list cam1_param;
@@ -145,6 +160,24 @@ vector couleur_blanc=	<1.000, 1.000, 1.000>;
 //                Fonctions
 // -------------------------------------------
 
+// --------------------------------------------
+//               Getter et setter
+// -------------------------------------------
+
+/*         ------- Lecture de données -------       */
+// recherche l'identifiant d'un bouton à partir de l'idenfiant d'une camera
+integer getBoutonFromCameraIndex(integer primsId)
+{
+	return llList2Integer(BoutonCamera, (primsId*2) +1);
+}
+
+integer getBoutonFromPrimIndex(integer primIndex)
+{
+	integer indexTableau = llListFindList(BoutonCamera, [primIndex]);
+	return (integer)indexTableau/2;
+}
+
+
 /*         ------   Droits    ------               */
 
 /* Donne les droits au controle de la camera */
@@ -178,29 +211,10 @@ couleur(integer prims, vector couleur)
 // Passe les couleurs des caméra en blanc 
 resetCouleurCamera()
 {
-	couleur(cam0_bouton, couleur_blanc);
-	couleur(cam1_bouton, couleur_blanc);
-	couleur(cam2_bouton, couleur_blanc);
-	couleur(cam3_bouton, couleur_blanc);
-	couleur(cam4_bouton, couleur_blanc);
-	couleur(cam5_bouton, couleur_blanc);
-	couleur(cam6_bouton, couleur_blanc);
-	couleur(cam7_bouton, couleur_blanc);
-	couleur(cam8_bouton, couleur_blanc);
-	couleur(cam9_bouton, couleur_blanc);
-	couleur(cam10_bouton, couleur_blanc);
-	couleur(cam11_bouton, couleur_blanc);
-	couleur(cam12_bouton, couleur_blanc);
-	couleur(cam13_bouton, couleur_blanc);
-	couleur(cam14_bouton, couleur_blanc);
-	couleur(cam15_bouton, couleur_blanc);
-	couleur(cam16_bouton, couleur_blanc);
-	couleur(cam17_bouton, couleur_blanc);
-	couleur(cam18_bouton, couleur_blanc);
-	couleur(cam19_bouton, couleur_blanc);
-	couleur(cam20_bouton, couleur_blanc);
-	
-	
+	integer nbBouton = (integer) llGetListLength(BoutonCamera) /2;
+	integer i;
+	for(i=1;i<nbBouton;++i)
+		couleur(getBoutonFromCameraIndex(i-1), couleur_blanc);
 }
 /*         ------ Donnée -----           */
 // Appel les caméra à se mètre à jours
@@ -530,12 +544,3 @@ default
 		}
 	}
 }
-
-
-/*getCameraPosition(integer perm)
-{
-    vector cam_position = llGetCameraPos();
-    rotation cam_rotation = llGetCameraRot();
-
-    debug("Position de la camera : " + (string) cam_position + " Rotatation de la camera : " + (string) cam_rotation);
-}*/
