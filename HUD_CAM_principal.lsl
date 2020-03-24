@@ -68,28 +68,29 @@ integer boutonManuelStatic = 15;
 integer boutonManuelMouvement = 4;
 
 // Camera
-list BoutonCamera = [
-	0, 25, //Cam 0 
-	1, 27, //Cam 1 
-	2, 26, //Cam 2
-	3, 21, //Cam 3
-	4, 14, //Cam 4
-	5, 6,  //Cam 5
-	6, 12, //Cam 6
-	7, 23, //Cam 7
-	8, 3,  //Cam 8
-	9, 16, //Cam 9
-	10, 13,//Cam 10
-	11, 18,//Cam 11
-	12, 2, //Cam 12
-	13, 5, //Cam 13
-	14, 17,//Cam 14
-	15, 7, //Cam 15
-	16, 11,//Cam 16
-	17, 8, //Cam 17
-	18, 9, //Cam 18
-	19, 20,//Cam 19
-	20, 22];//Cam 20
+list cameraBouton = [
+    "c0", "p25", //Cam 0 
+    "c1", "p27", //Cam 1 
+    "c2", "p26", //Cam 2
+    "c3", "p21", //Cam 3
+    "c4", "p14", //Cam 4
+    "c5", "p6",  //Cam 5
+    "c6", "p12", //Cam 6
+    "c7", "p23", //Cam 7
+    "c8", "p3",  //Cam 8
+    "c9", "p16", //Cam 9
+    "c10", "p13",//Cam 10
+    "c11", "p18",//Cam 11
+    "c12", "p2", //Cam 12
+    "c13", "p5", //Cam 13
+    "c14", "p17",//Cam 14
+    "c15", "p7", //Cam 15
+    "c16", "p11",//Cam 16
+    "c17", "p8", //Cam 17
+    "c18", "p9", //Cam 18
+    "c19", "p20",//Cam 19
+    "c20", "p22" //Cam 20
+    ];
 
 // Camera - Directe
 integer infoSynchro = 28;
@@ -102,59 +103,40 @@ integer camSelectionne;
 
 /*         ------   Camera    ------               */
 // Mémoire
-// Camera - OLD
-integer cam0_bouton = 25; 
-integer cam1_bouton = 27;
-integer cam2_bouton = 26;
-integer cam3_bouton= 21;
-integer cam4_bouton= 14;
-integer cam5_bouton= 6;
-integer cam6_bouton= 12;
-integer cam7_bouton= 23;
-integer cam8_bouton= 3;
-integer cam9_bouton= 16;
-integer cam10_bouton = 13; 
-integer cam11_bouton = 18;
-integer cam12_bouton = 2;
-integer cam13_bouton= 5;
-integer cam14_bouton= 17;
-integer cam15_bouton= 7;
-integer cam16_bouton= 11;
-integer cam17_bouton= 8;
-integer cam18_bouton= 9;
-integer cam19_bouton= 20;
-integer cam20_bouton= 22;
-// Lis de mémoires
-list cam0_param;
-list cam1_param;
-list cam2_param;
-list cam3_param;
-list cam4_param;
-list cam5_param;
-list cam6_param;
-list cam7_param;
-list cam8_param;
-list cam9_param;
-list cam10_param;
-list cam11_param;
-list cam12_param;
-list cam13_param;
-list cam14_param;
-list cam15_param;
-list cam16_param;
-list cam17_param;
-list cam18_param;
-list cam19_param;
-list cam20_param;
+list cameraParams = [
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 0
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 1
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 2
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 3
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 4
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 5
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 6
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 7
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 8
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 9
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 10
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 11
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 12
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 13
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 14
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 15
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 16
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 17
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 18
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 19
+    <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0> // Cam 20
+];
+    
+
 
 integer cam_curent;
 
 /*         ------   Couleurs    ------               */
 vector couleur_bleu = <0.000, 0.455, 0.851>;
 vector couleur_rouge = <1.000, 0.255, 0.212>;
-vector couleur_orange= 	<1.000, 0.522, 0.106>;
+vector couleur_orange=     <1.000, 0.522, 0.106>;
 vector couleur_vert = <0.180, 0.800, 0.251> ;
-vector couleur_blanc=	<1.000, 1.000, 1.000>;
+vector couleur_blanc=    <1.000, 1.000, 1.000>;
 
 // --------------------------------------------
 //                Fonctions
@@ -165,18 +147,52 @@ vector couleur_blanc=	<1.000, 1.000, 1.000>;
 // -------------------------------------------
 
 /*         ------- Lecture de données -------       */
+
 // recherche l'identifiant d'un bouton à partir de l'idenfiant d'une camera
-integer getBoutonFromCameraIndex(integer primsId)
+integer getBoutonFromCameraIndex(integer cameraIndex)
 {
-	return llList2Integer(BoutonCamera, (primsId*2) +1);
+	return llList2Integer(cameraBouton, (cameraIndex*2) +1);
 }
 
-integer getBoutonFromPrimIndex(integer primIndex)
+// recherche d'un identifiant de camera à partir d'un index de prim
+integer getIndexCamFromBouton(integer primIndex)
 {
-	integer indexTableau = llListFindList(BoutonCamera, [primIndex]);
-	return (integer)indexTableau/2;
+	string elementRecherche = "p"+(string)primIndex;
+    integer elementTableau = llListFindList(cameraBouton, [elementRecherche]);
+    if (elementTableau == -1)
+    	return elementTableau;
+    else
+    	return (integer)elementTableau/2;
 }
 
+
+// récupère les rotation 
+rotation getRotation(integer indexCam)
+{
+	debug("getRotation() : "+(string)llList2Rot(cameraParams, indexCam*2));
+    return llList2Rot(cameraParams, indexCam*2);
+}
+
+// récupère les positions
+vector getVector(integer indexCam)
+{
+	debug("getVector() : "+(string)llList2Vector(cameraParams, (indexCam*2)+1));
+    return  llList2Vector(cameraParams, (indexCam*2)+1);
+}
+
+// Set un nouvelle rotation
+setRotation(integer indexCam, rotation rot)
+{
+    integer indexList = indexCam * 2;
+    cameraParams = llListReplaceList(cameraParams, [rot], indexList, indexList);
+}
+
+// Set une nouvelle position
+setPosition (integer indexCam, vector pos)
+{
+    integer indexList = (indexCam*2) + 1;
+    cameraParams = llListReplaceList(cameraParams, [pos], indexList, indexList);
+}
 
 /*         ------   Droits    ------               */
 
@@ -211,10 +227,10 @@ couleur(integer prims, vector couleur)
 // Passe les couleurs des caméra en blanc 
 resetCouleurCamera()
 {
-	integer nbBouton = (integer) llGetListLength(BoutonCamera) /2;
-	integer i;
-	for(i=1;i<nbBouton;++i)
-		couleur(getBoutonFromCameraIndex(i-1), couleur_blanc);
+    integer nbBouton = (integer) llGetListLength(cameraBouton) /2;
+    integer i;
+    for(i=1;i<=nbBouton;++i)
+        couleur(getBoutonFromCameraIndex(i-1), couleur_blanc);
 }
 /*         ------ Donnée -----           */
 // Appel les caméra à se mètre à jours
@@ -237,124 +253,22 @@ recupereInformation(string message)
     
     // Enfin on va setter les informations dans la camera correspondante
     debug("recupereInformation() | Idenfifiant "+ (string) indexCamera +"| POS : "+ (string) pos  + " Rot : " +(string) rot ) ;
- 		
-	// Gestion des caméra de 1 à 10
-	if(indexCamera == 0)
-	{
-		cam0_param = [pos, rot];
-		couleur(cam0_bouton, couleur_bleu);
-	}
-	else if(indexCamera == 1)
-	{
-		cam1_param = [pos, rot]; 
-		couleur(cam1_bouton, couleur_bleu);
-	}
-	else if(indexCamera == 2)
-	{
-		cam2_param= [pos, rot];
-		couleur(cam2_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 3)
-	{
-		cam3_param= [pos, rot];
-		couleur(cam3_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 4)
-	{
-		cam4_param= [pos, rot];
-		couleur(cam4_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 5)
-	{
-		cam5_param= [pos, rot];
-		couleur(cam5_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 6)
-	{
-		cam6_param= [pos, rot];
-		couleur(cam6_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 7)
-	{
-		cam7_param= [pos, rot];
-		couleur(cam7_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 8)
-	{
-		cam8_param= [pos, rot];
-		couleur(cam8_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 9)
-	{
-		cam9_param= [pos, rot];
-		couleur(cam9_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 10)
-	{
-		cam10_param= [pos, rot];
-		couleur(cam10_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 11)
-	{
-		cam11_param= [pos, rot];
-		couleur(cam11_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 12)
-	{
-		cam12_param= [pos, rot];
-		couleur(cam12_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 13)
-	{
-		cam13_param= [pos, rot];
-		couleur(cam13_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 14)
-	{
-		cam14_param= [pos, rot];
-		couleur(cam14_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 15)
-	{
-		cam15_param= [pos, rot];
-		couleur(cam15_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 16)
-	{
-		cam16_param= [pos, rot];
-		couleur(cam16_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 17)
-	{
-		cam17_param= [pos, rot];
-		couleur(cam17_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 18)
-	{
-		cam18_param= [pos, rot];
-		couleur(cam18_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 19)
-	{
-		cam19_param= [pos, rot];
-		couleur(cam19_bouton, couleur_bleu);		
-	}
-	else if(indexCamera == 20)
-	{
-		cam20_param= [pos, rot];
-		couleur(cam20_bouton, couleur_bleu);		
-	}
+         
+   setRotation(indexCamera, rot);
+   setPosition(indexCamera, pos);
+   
+   debug("getIndexCamFromBouton(indexCamera)");
+   couleur(getBoutonFromCameraIndex(indexCamera), couleur_bleu);
+
 }
-
-
 // Charge la position de la caméra
-updateCamera(list parametre, integer bouton)
+updateCamera(integer bouton, integer indexCam)
 {
-	vector pos = llList2Vector(parametre,0);
-	rotation rot = llList2Rot(parametre,1);
-	
-	llOwnerSay("UpdateCamera() - Position " +(string) pos + " rotation : "+(string) rot );
-	 llSetCameraParams([
+    vector pos = getVector(indexCam);
+    rotation rot = getRotation(indexCam);
+    
+    debug("UpdateCamera() - Position " +(string) pos + " rotation : "+(string) rot );
+     llSetCameraParams([
         CAMERA_ACTIVE, 1, // 1 is active, 0 is inactive
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
         CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
@@ -386,37 +300,36 @@ vector convertionFocus(vector position, rotation camera)
 // Envoie la coordoné de la camera au bot sous la forme standard. 
 sendCameraStaticManual()
 {
-	string coo =  "CAM_201_"+ ACTION_SET_INFO +" P1 " + (string) llGetCameraPos() + "                     R1 " + (string) llGetCameraRot();
-	debug(coo);
+    string coo =  "CAM_201_"+ ACTION_SET_INFO +" P1 " + (string) llGetCameraPos() + "                     R1 " + (string) llGetCameraRot();
+    debug(coo);
 }
 
 // envois des coordonées
 sendCameraMouvementManual()
 {
-	// Mise en place du timer
-	llSetTimerEvent(0.5);
-	// activation de la variable camMouvementManuel
-	camMouvementManuel = TRUE;
+    // Mise en place du timer
+    llSetTimerEvent(0.5);
+    // activation de la variable camMouvementManuel
+    camMouvementManuel = TRUE;
 }
 
 /*            ---- Mode | différé ---              */
 // Gestion du bouton fast : Active le bouton send
 cameraFastMode()
 {
-		camFast = !camFast ;
-		debug("cam Fast" + (string)camFast);
-		if(camFast)
-			couleur(boutonFast, couleur_vert);
-		else
-			couleur(boutonFast, couleur_blanc);
+        camFast = !camFast ;
+        debug("cam Fast" + (string)camFast);
+        if(camFast)
+            couleur(boutonFast, couleur_vert);
+        else
+            couleur(boutonFast, couleur_blanc);
 }
 
 // Si le bouton send ets pressé, on envois la 
 cameraSendInfo()
 {
-	
+    
 }
-
 
 default
 {
@@ -432,75 +345,38 @@ default
     {
         integer touchedButton = llDetectedLinkNumber(0);
         integer perm = llGetPermissions();
+        integer camIndex = getIndexCamFromBouton(touchedButton);
+   
         if(getToutchedPrim)
             debug("Touched -" + (string) touchedButton);
-         
-        /*         ---- Droit ---            */
-        // Camera On
-        if (touchedButton == boutonSynchro)
-            DroitCameraOn(perm);
-        // Camera off
-        else if (touchedButton == boutonDeSyncrho)// ------Désynchro
-            DroitCameraOff(perm); 
-        /*         ---- Camera ---          */   
-        else if(touchedButton == boutonInfoUpdate)
-            appelInfoUpdate();
-        else if(touchedButton == cam0_bouton)
-			updateCamera(cam0_param, cam0_bouton);
-		else if (touchedButton == cam1_bouton)
-			updateCamera(cam1_param, cam1_bouton);
-		else if (touchedButton == cam2_bouton)
-			updateCamera(cam2_param, cam2_bouton);
-		else if (touchedButton == cam2_bouton)
-			updateCamera(cam2_param, cam2_bouton);
-		else if (touchedButton == cam3_bouton)
-			updateCamera(cam3_param, cam3_bouton);
-		else if (touchedButton == cam4_bouton)
-			updateCamera(cam4_param, cam4_bouton);
-		else if (touchedButton == cam5_bouton)
-			updateCamera(cam5_param, cam5_bouton);
-		else if (touchedButton == cam6_bouton)
-			updateCamera(cam6_param, cam6_bouton);
-		else if (touchedButton == cam7_bouton)
-			updateCamera(cam7_param, cam7_bouton);
-		else if (touchedButton == cam8_bouton)
-			updateCamera(cam8_param, cam8_bouton);
-		else if (touchedButton == cam9_bouton)
-			updateCamera(cam9_param, cam9_bouton);
-		else if (touchedButton == cam9_bouton)
-			updateCamera(cam9_param, cam9_bouton);
-		else if (touchedButton == cam10_bouton)
-			updateCamera(cam10_param, cam10_bouton);
-		else if (touchedButton == cam11_bouton)
-			updateCamera(cam11_param, cam11_bouton);
-		else if (touchedButton == cam12_bouton)
-			updateCamera(cam12_param, cam12_bouton);
-		else if (touchedButton == cam13_bouton)
-			updateCamera(cam13_param, cam13_bouton);
-		else if (touchedButton == cam14_bouton)
-			updateCamera(cam14_param, cam14_bouton);
-		else if (touchedButton == cam15_bouton)
-			updateCamera(cam15_param, cam15_bouton);
-		else if (touchedButton == cam16_bouton)
-			updateCamera(cam16_param, cam16_bouton);
-		else if (touchedButton == cam17_bouton)
-			updateCamera(cam17_param, cam17_bouton);
-		else if (touchedButton == cam18_bouton)
-			updateCamera(cam18_param, cam18_bouton);
-		else if (touchedButton == cam19_bouton)
-			updateCamera(cam19_param, cam19_bouton);
-		else if (touchedButton == cam20_bouton)
-			updateCamera(cam20_param, cam20_bouton);
-			
-		/*             ----- Manuelle -------                */
-		else if (touchedButton == boutonManuelStatic)
-			sendCameraStaticManual();
-		else if (touchedButton == boutonManuelMouvement)
-			sendCameraMouvementManual();
-			
-		/*         ------ Mode Directe - diff    -------      */
-		else if(touchedButton == boutonFast)
-			cameraFastMode();
+        
+
+        if(camIndex == -1)
+        {
+        	debug("Index Cam " + (string) camIndex );
+            /*         ---- Droit ---            */
+            // Camera On
+            if (touchedButton == boutonSynchro)
+                DroitCameraOn(perm);
+            // Camera off
+            else if (touchedButton == boutonInfoUpdate)
+				appelInfoUpdate();
+            else if (touchedButton == boutonDeSyncrho)// ------Désynchro
+                DroitCameraOff(perm); 
+            /*             ----- Manuelle -------                */
+            else if (touchedButton == boutonManuelStatic)
+                sendCameraStaticManual();
+            else if (touchedButton == boutonManuelMouvement)
+                sendCameraMouvementManual();
+            /*         ------ Mode Directe - diff    -------      */
+            else if(touchedButton == boutonFast)
+                cameraFastMode();
+        }
+        else
+        {
+        	debug("Index Cam " + (string) camIndex );
+            updateCamera(touchedButton, camIndex);    
+        }
 }
     
     
@@ -509,12 +385,12 @@ default
         if(perm & PERMISSION_CONTROL_CAMERA)
         {
              couleur(infoSynchro, couleur_bleu);
-             llOwnerSay("Camera Ouvert");
+             debug("Camera Ouvert");
         }
         if (perm & PERMISSION_TRACK_CAMERA)
         {
             couleur(infoSynchro, couleur_bleu);
-            llOwnerSay("tracking ouvert");
+            debug("tracking ouvert");
         }
     }
     
@@ -529,18 +405,18 @@ default
     }
     
     
-	timer()
-	{
-		iteration += 1;
-		if(camMouvementManuel)
-		{
-			sendCameraStaticManual();
-			if(iteration>14)
-			{
-				llSetTimerEvent(0.0);
-				iteration = 0;
-				camMouvementManuel = FALSE;
-			}
-		}
-	}
+    timer()
+    {
+        iteration += 1;
+        if(camMouvementManuel)
+        {
+            sendCameraStaticManual();
+            if(iteration>14)
+            {
+                llSetTimerEvent(0.0);
+                iteration = 0;
+                camMouvementManuel = FALSE;
+            }
+        }
+    }
 }
