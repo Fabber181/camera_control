@@ -46,6 +46,7 @@ integer channel = 2830;
 vector offsetCamera = <1.0000,0.0000,0.0000>; // Calcul de l'offset
 integer camMouvementManuel = FALSE;
 integer camFast = FALSE;
+integer camFastAlume = FALSE;
 integer camEnCours;
 integer iteration = 0;
 
@@ -151,32 +152,34 @@ vector couleur_blanc=    <1.000, 1.000, 1.000>;
 // recherche l'identifiant d'un bouton à partir de l'idenfiant d'une camera
 integer getBoutonFromCameraIndex(integer cameraIndex)
 {
-	return llList2Integer(cameraBouton, (cameraIndex*2) +1);
+    string resultat = llList2String(cameraBouton, (cameraIndex*2) +1);
+    debug("test - " + (string) llGetSubString(resultat, 1,2));
+    return (integer) llGetSubString(resultat, 1,2);
 }
 
 // recherche d'un identifiant de camera à partir d'un index de prim
 integer getIndexCamFromBouton(integer primIndex)
 {
-	string elementRecherche = "p"+(string)primIndex;
+    string elementRecherche = "p"+(string)primIndex;
     integer elementTableau = llListFindList(cameraBouton, [elementRecherche]);
     if (elementTableau == -1)
-    	return elementTableau;
+        return elementTableau;
     else
-    	return (integer)elementTableau/2;
+        return (integer)elementTableau/2;
 }
 
 
 // récupère les rotation 
 rotation getRotation(integer indexCam)
 {
-	debug("getRotation() : "+(string)llList2Rot(cameraParams, indexCam*2));
+    //debug("getRotation() : "+(string)llList2Rot(cameraParams, indexCam*2));
     return llList2Rot(cameraParams, indexCam*2);
 }
 
 // récupère les positions
 vector getVector(integer indexCam)
 {
-	debug("getVector() : "+(string)llList2Vector(cameraParams, (indexCam*2)+1));
+    //debug("getVector() : "+(string)llList2Vector(cameraParams, (indexCam*2)+1));
     return  llList2Vector(cameraParams, (indexCam*2)+1);
 }
 
@@ -201,6 +204,7 @@ DroitCameraOn(integer perm)
 {
     // Si pas de droit
     llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA | PERMISSION_TRACK_CAMERA);
+     llSetCameraParams([CAMERA_ACTIVE, 1]);
     couleur(infoSynchro, couleur_bleu);
 }
 
@@ -210,7 +214,7 @@ DroitCameraOff(integer perm)
     // Si il y a des droits de donnés
     if (perm & PERMISSION_CONTROL_CAMERA)
     {
-        debug("deSynchro - révocation des droits");
+        //debug("deSynchro - révocation des droits");
         llSetCameraParams([CAMERA_ACTIVE, 0]);
         llClearCameraParams();
     }
@@ -252,12 +256,12 @@ recupereInformation(string message)
     rotation rot = (rotation) llGetSubString(message, debutAngle , debutAngle+ 60);
     
     // Enfin on va setter les informations dans la camera correspondante
-    debug("recupereInformation() | Idenfifiant "+ (string) indexCamera +"| POS : "+ (string) pos  + " Rot : " +(string) rot ) ;
+    //debug("recupereInformation() | Idenfifiant "+ (string) indexCamera +"| POS : "+ (string) pos  + " Rot : " +(string) rot ) ;
          
    setRotation(indexCamera, rot);
    setPosition(indexCamera, pos);
    
-   debug("getIndexCamFromBouton(indexCamera)");
+   //debug("getIndexCamFromBouton(indexCamera)" + (string) getBoutonFromCameraIndex(indexCamera));
    couleur(getBoutonFromCameraIndex(indexCamera), couleur_bleu);
 
 }
@@ -266,10 +270,10 @@ updateCamera(integer bouton, integer indexCam)
 {
     vector pos = getVector(indexCam);
     rotation rot = getRotation(indexCam);
+    camEnCours = indexCam;
     
-    debug("UpdateCamera() - Position " +(string) pos + " rotation : "+(string) rot );
+    //debug("UpdateCamera() - Position " +(string) pos + " rotation : "+(string) rot );
      llSetCameraParams([
-        CAMERA_ACTIVE, 1, // 1 is active, 0 is inactive
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
         CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
         CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
@@ -284,6 +288,10 @@ updateCamera(integer bouton, integer indexCam)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
         CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
         ]);
+        
+        if (camFast)
+        	cameraSwitchToBot();
+        	
 }
 
 /* -- Convertion de rotation en focus -- */
@@ -298,10 +306,14 @@ vector convertionFocus(vector position, rotation camera)
 
 /*            ---- Camera | Manual ---              */
 // Envoie la coordoné de la camera au bot sous la forme standard. 
-sendCameraStaticManual()
+sendCameraStaticManualToBot()
 {
-    string coo =  "CAM_201_"+ ACTION_SET_INFO +" P1 " + (string) llGetCameraPos() + "                     R1 " + (string) llGetCameraRot();
-    debug(coo);
+    llRegionSay(channel, "BOT_MFI_000 P1 " + (string) llGetCameraPos() + "                     R1 " + (string) llGetCameraRot());
+}
+
+sendCameraMouvementManualToBot()
+{
+    llRegionSay(channel, "BOT_MMO_"+(string) iteration +" P1 " + (string) llGetCameraPos() + "                     R1 " + (string) llGetCameraRot());    
 }
 
 // envois des coordonées
@@ -318,7 +330,7 @@ sendCameraMouvementManual()
 cameraFastMode()
 {
         camFast = !camFast ;
-        debug("cam Fast" + (string)camFast);
+       // debug("cam Fast" + (string)camFast);
         if(camFast)
             couleur(boutonFast, couleur_vert);
         else
@@ -326,9 +338,9 @@ cameraFastMode()
 }
 
 // Si le bouton send ets pressé, on envois la 
-cameraSendInfo()
+cameraSwitchToBot()
 {
-    
+   llRegionSay(channel, "BOT_CAM_" + (string)camEnCours);
 }
 
 default
@@ -353,19 +365,21 @@ default
 
         if(camIndex == -1)
         {
-        	debug("Index Cam " + (string) camIndex );
+            //debug("Index Cam " + (string) camIndex );
             /*         ---- Droit ---            */
             // Camera On
-            if (touchedButton == boutonSynchro)
+            if (touchedButton == boutonSend && !camFast)
+				cameraSwitchToBot();
+            else if (touchedButton == boutonSynchro)
                 DroitCameraOn(perm);
             // Camera off
             else if (touchedButton == boutonInfoUpdate)
-				appelInfoUpdate();
+                appelInfoUpdate();
             else if (touchedButton == boutonDeSyncrho)// ------Désynchro
                 DroitCameraOff(perm); 
             /*             ----- Manuelle -------                */
             else if (touchedButton == boutonManuelStatic)
-                sendCameraStaticManual();
+                sendCameraStaticManualToBot();
             else if (touchedButton == boutonManuelMouvement)
                 sendCameraMouvementManual();
             /*         ------ Mode Directe - diff    -------      */
@@ -374,7 +388,7 @@ default
         }
         else
         {
-        	debug("Index Cam " + (string) camIndex );
+            //debug("Index Cam " + (string) camIndex );
             updateCamera(touchedButton, camIndex);    
         }
 }
@@ -410,12 +424,21 @@ default
         iteration += 1;
         if(camMouvementManuel)
         {
-            sendCameraStaticManual();
+        	// clignotement 
+        	if(camFastAlume)
+        		couleur(boutonManuelMouvement, couleur_vert);
+        	else
+        		couleur(boutonManuelMouvement, couleur_orange);
+        	camFastAlume = !camFastAlume;
+        	
+        	sendCameraMouvementManualToBot();
             if(iteration>14)
             {
                 llSetTimerEvent(0.0);
                 iteration = 0;
                 camMouvementManuel = FALSE;
+                camFastAlume = FALSE;
+                couleur(boutonManuelMouvement, couleur_blanc);
             }
         }
     }
