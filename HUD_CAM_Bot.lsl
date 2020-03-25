@@ -1,8 +1,8 @@
 // ######################################################################################
 //               Gestion des Camera - HUD Assistant
 // ######################################################################################
-/* 
-Ce hud est utilisé par l'assistant, il lui permet de se synchroniser sur les camera et de prendre le controle du Hud Camera 
+/*
+Ce hud est utilisé par l'assistant, il lui permet de se synchroniser sur les camera et de prendre le controle du Hud Camera
  - (A faire) Permet à l'operateur de tester les plans de cadrages disponnibles
  - (A faire)Permet à l'operateur d'envoyer un plan au cadreur
  - (A faire) Permet à l'opérateur de cadrer des plans fixes et de les envoyer à l'opérateur
@@ -15,7 +15,7 @@ Ce hud est utilisé par l'assistant, il lui permet de se synchroniser sur les ca
 integer modeDebug = TRUE;
 integer modeInfo = TRUE;
 integer getToutchedPrim = FALSE;
-    
+
 /* Fonction de Debug */
 debug(string message)
 {
@@ -45,8 +45,6 @@ info(string message)
 integer channel = 2830;
 vector offsetCamera = <1.0000,0.0000,0.0000>; // Calcul de l'offset
 integer camMouvementManuel = FALSE;
-integer camFast = FALSE;
-integer camFastAlume = FALSE;
 integer camEnCours;
 integer iteration = 0;
 
@@ -60,18 +58,18 @@ string ACTION_GET_INFO = "GET_INFO";
 string ACTION_SET_INFO= "SET_INFO";
 string ACTION_GIV_INFO= "GIV_INFO";
 string ACTION_SET_CAME= "SET_CAME";
+string ACTION_BOT_MFIX= "BOT_MFIX";
+string ACTION_BOT_MMOV=    "BOT_MMOV";
 
 /*         ------   Boutons    ------               */
 // Permissions
 integer boutonSynchro = 24;
 integer boutonDeSyncrho = 29;
-integer boutonManuelStatic = 15;
-integer boutonManuelMouvement = 4;
 
 // Camera
 list cameraBouton = [
-    "c0", "p25", //Cam 0 
-    "c1", "p27", //Cam 1 
+    "c0", "p25", //Cam 0
+    "c1", "p27", //Cam 1
     "c2", "p26", //Cam 2
     "c3", "p21", //Cam 3
     "c4", "p14", //Cam 4
@@ -96,11 +94,8 @@ list cameraBouton = [
 // Camera - Directe
 integer infoSynchro = 28;
 integer boutonInfoUpdate = 19;
-integer boutonFast = 35;
-integer boutonSend = 10;
 
 /*         ------------ Variables --------             */
-integer camSelectionne;
 
 /*         ------   Camera    ------               */
 // Mémoire
@@ -127,10 +122,6 @@ list cameraParams = [
     <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0>, // Cam 19
     <0.0, 0.0, 0.0>, <0.0,0.0,0.0,0.0> // Cam 20
 ];
-    
-
-
-integer cam_curent;
 
 /*         ------   Couleurs    ------               */
 vector couleur_bleu = <0.000, 0.455, 0.851>;
@@ -157,19 +148,7 @@ integer getBoutonFromCameraIndex(integer cameraIndex)
     return (integer) llGetSubString(resultat, 1,2);
 }
 
-// recherche d'un identifiant de camera à partir d'un index de prim
-integer getIndexCamFromBouton(integer primIndex)
-{
-    string elementRecherche = "p"+(string)primIndex;
-    integer elementTableau = llListFindList(cameraBouton, [elementRecherche]);
-    if (elementTableau == -1)
-        return elementTableau;
-    else
-        return (integer)elementTableau/2;
-}
-
-
-// récupère les rotation 
+// récupère les rotation
 rotation getRotation(integer indexCam)
 {
     //debug("getRotation() : "+(string)llList2Rot(cameraParams, indexCam*2));
@@ -198,9 +177,8 @@ setPosition (integer indexCam, vector pos)
 }
 
 /*         ------   Droits    ------               */
-
 /* Donne les droits au controle de la camera */
-DroitCameraOn(integer perm)
+DroitCameraOn()
 {
     // Si pas de droit
     llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA | PERMISSION_TRACK_CAMERA);
@@ -228,7 +206,7 @@ couleur(integer prims, vector couleur)
     llSetLinkPrimitiveParamsFast(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
 }
 
-// Passe les couleurs des caméra en blanc 
+// Passe les couleurs des caméra en blanc
 resetCouleurCamera()
 {
     integer nbBouton = (integer) llGetListLength(cameraBouton) /2;
@@ -254,13 +232,13 @@ recupereInformation(string message)
     // Récupération de la rotation
     integer debutAngle = llSubStringIndex(message, "R1") + 3;
     rotation rot = (rotation) llGetSubString(message, debutAngle , debutAngle+ 60);
-    
+
     // Enfin on va setter les informations dans la camera correspondante
     //debug("recupereInformation() | Idenfifiant "+ (string) indexCamera +"| POS : "+ (string) pos  + " Rot : " +(string) rot ) ;
-         
+
    setRotation(indexCamera, rot);
    setPosition(indexCamera, pos);
-   
+
    //debug("getIndexCamFromBouton(indexCamera)" + (string) getBoutonFromCameraIndex(indexCamera));
    couleur(getBoutonFromCameraIndex(indexCamera), couleur_bleu);
 
@@ -270,8 +248,8 @@ updateCamera(integer bouton, integer indexCam)
 {
     vector pos = getVector(indexCam);
     rotation rot = getRotation(indexCam);
-    camEnCours = indexCam;
-    
+
+
     //debug("UpdateCamera() - Position " +(string) pos + " rotation : "+(string) rot );
      llSetCameraParams([
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
@@ -288,10 +266,17 @@ updateCamera(integer bouton, integer indexCam)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
         CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
         ]);
-        
-        if (camFast)
-        	cameraSwitchToBot();
-        	
+
+    infoCam(indexCam);
+}
+/* -- En vois un message dans le local avec l'ancienne camera utilsié / Nouvelle -- */
+infoCam(integer indexCam)
+{
+    llRegionSay(channel, "INF_CAM      ON_"+(string) indexCam + "     OFF_"+ (string) camEnCours);
+
+    couleur(getBoutonFromCameraIndex(indexCam), couleur_vert);
+    couleur(getBoutonFromCameraIndex(camEnCours), couleur_bleu);
+    camEnCours = indexCam;
 }
 
 /* -- Convertion de rotation en focus -- */
@@ -302,144 +287,42 @@ vector convertionFocus(vector position, rotation camera)
     return position + offsetCamera*camera;
 }
 
-
-
-/*            ---- Camera | Manual ---              */
-// Envoie la coordoné de la camera au bot sous la forme standard. 
-sendCameraStaticManualToBot()
+/* --  Set une camera random   -- */
+updateRandomCamera()
 {
-    llRegionSay(channel, "BOT_MFIX_000 P1 " + (string) llGetCameraPos() + "                     R1 " + (string) llGetCameraRot());
-}
-
-sendCameraMouvementManualToBot()
-{
-    llRegionSay(channel, "BOT_MMOV_"+(string) iteration +" P1 " + (string) llGetCameraPos() + "                     R1 " + (string) llGetCameraRot());    
-}
-
-// envois des coordonées
-sendCameraMouvementManual()
-{
-    // Mise en place du timer
-    llSetTimerEvent(0.5);
-    // activation de la variable camMouvementManuel
-    camMouvementManuel = TRUE;
-}
-
-/*            ---- Mode | différé ---              */
-// Gestion du bouton fast : Active le bouton send
-cameraFastMode()
-{
-        camFast = !camFast ;
-       // debug("cam Fast" + (string)camFast);
-        if(camFast)
-            couleur(boutonFast, couleur_vert);
-        else
-            couleur(boutonFast, couleur_blanc);
-}
-
-// Si le bouton send ets pressé, on envois la 
-cameraSwitchToBot()
-{
-   llRegionSay(channel, "BOT_CAME_" + (string)camEnCours);
+    integer indexCam = (integer)llFrand(20.0);
+    integer indexBoutonCam = getBoutonFromCameraIndex(indexCam);
+    updateCamera(indexBoutonCam, indexCam);
 }
 
 default
 {
-    
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
     state_entry()
     {
-        info("Reset - script");
+        DroitCameraOn();
         llListen(channel, "", NULL_KEY, "");
-        resetCouleurCamera();
+        llSleep(1);
+        appelInfoUpdate();
+        llSetTimerEvent(7);
     }
 
-    touch_start(integer total_number)
-    {
-        integer touchedButton = llDetectedLinkNumber(0);
-        integer perm = llGetPermissions();
-        integer camIndex = getIndexCamFromBouton(touchedButton);
-   
-        if(getToutchedPrim)
-            debug("Touched -" + (string) touchedButton);
-        
-
-        if(camIndex == -1)
-        {
-            //debug("Index Cam " + (string) camIndex );
-            /*         ---- Droit ---            */
-            // Camera On
-            if (touchedButton == boutonSend && !camFast)
-				cameraSwitchToBot();
-            else if (touchedButton == boutonSynchro)
-                DroitCameraOn(perm);
-            // Camera off
-            else if (touchedButton == boutonInfoUpdate)
-                appelInfoUpdate();
-            else if (touchedButton == boutonDeSyncrho)// ------Désynchro
-                DroitCameraOff(perm); 
-            /*             ----- Manuelle -------                */
-            else if (touchedButton == boutonManuelStatic)
-                sendCameraStaticManualToBot();
-            else if (touchedButton == boutonManuelMouvement)
-                sendCameraMouvementManual();
-            /*         ------ Mode Directe - diff    -------      */
-            else if(touchedButton == boutonFast)
-                cameraFastMode();
-        }
-        else
-        {
-            //debug("Index Cam " + (string) camIndex );
-            updateCamera(touchedButton, camIndex);    
-        }
-}
-    
-    
-     run_time_permissions(integer perm)
-    {
-        if(perm & PERMISSION_CONTROL_CAMERA)
-        {
-             couleur(infoSynchro, couleur_bleu);
-             debug("Camera Ouvert");
-        }
-        if (perm & PERMISSION_TRACK_CAMERA)
-        {
-            couleur(infoSynchro, couleur_bleu);
-            debug("tracking ouvert");
-        }
-    }
-    
-    
     listen(integer channel, string name, key id, string message)
     {
-        // Recuperation de l'action
-        string action = llGetSubString(message, llList2Integer(comPositionInfoAction,0) , llList2Integer(comPositionInfoAction,1));
-        
+         string action = llGetSubString(message, llList2Integer(comPositionInfoAction,0) , llList2Integer(comPositionInfoAction,1));
+         string indexCam = llGetSubString(message, llList2Integer(comPositionIndexCamera,0) , llList2Integer(comPositionIndexCamera,1));
+
+        /* -- Récupération des données -- */
         if(action == ACTION_GIV_INFO)
             recupereInformation(message);
     }
-    
-    
+
     timer()
     {
-        iteration += 1;
-        if(camMouvementManuel)
-        {
-        	// clignotement 
-        	if(camFastAlume)
-        		couleur(boutonManuelMouvement, couleur_vert);
-        	else
-        		couleur(boutonManuelMouvement, couleur_orange);
-        	camFastAlume = !camFastAlume;
-        	
-        	sendCameraMouvementManualToBot();
-            if(iteration>14)
-            {
-                llSetTimerEvent(0.0);
-                iteration = 0;
-                camMouvementManuel = FALSE;
-                camFastAlume = FALSE;
-                couleur(boutonManuelMouvement, couleur_blanc);
-            }
-        }
+        updateRandomCamera();
     }
+
 }
