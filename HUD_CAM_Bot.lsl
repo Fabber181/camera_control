@@ -144,7 +144,7 @@ vector couleur_blanc=    <1.000, 1.000, 1.000>;
 integer getBoutonFromCameraIndex(integer cameraIndex)
 {
     string resultat = llList2String(cameraBouton, (cameraIndex*2) +1);
-    debug("test - " + (string) llGetSubString(resultat, 1,2));
+    //debug("test - " + (string) llGetSubString(resultat, 1,2));
     return (integer) llGetSubString(resultat, 1,2);
 }
 
@@ -290,9 +290,16 @@ vector convertionFocus(vector position, rotation camera)
 /* --  Set une camera random   -- */
 updateRandomCamera()
 {
-    integer indexCam = (integer)llFrand(20.0);
+    llSetLinkTextureAnim(1, ANIM_ON , ALL_SIDES, 1, 60, 0, 60, 30);
+    integer indexCam = (integer)llFrand(40.0)/2;
+    if (indexCam == camEnCours)
+        indexCam = (integer)llFrand(40.0)/2;
     integer indexBoutonCam = getBoutonFromCameraIndex(indexCam);
+    llSleep(2);
     updateCamera(indexBoutonCam, indexCam);
+    llSleep(0.5);
+    llSetLinkTextureAnim(1, ANIM_ON | REVERSE , ALL_SIDES, 1, 60, 0, 60, 30);
+    
 }
 
 default
