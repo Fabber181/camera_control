@@ -47,11 +47,14 @@ vector offsetCamera = <1.0000,0.0000,0.0000>; // Calcul de l'offset
 integer camMouvementManuel = FALSE;
 integer camEnCours;
 integer iteration = 0;
+integer veille = 0;
 
 // Communication
 list comPositionIndexCamera = [4,6];
 list comPositionInfoAction = [8,15];
 list comPositionPos = [20,59];
+list comBotInfo = [0,7];
+list comBotIndexCam = [9,12];
 
 string INSTANCE_ALL = "ALL";
 string ACTION_GET_INFO = "GET_INFO";
@@ -59,7 +62,8 @@ string ACTION_SET_INFO= "SET_INFO";
 string ACTION_GIV_INFO= "GIV_INFO";
 string ACTION_SET_CAME= "SET_CAME";
 string ACTION_BOT_MFIX= "BOT_MFIX";
-string ACTION_BOT_MMOV=    "BOT_MMOV";
+string ACTION_BOT_MMOV= "BOT_MMOV";
+string ACTION_BOT_CAME= "BOT_CAME";
 
 /*         ------   Boutons    ------               */
 // Permissions
@@ -176,6 +180,30 @@ setPosition (integer indexCam, vector pos)
     cameraParams = llListReplaceList(cameraParams, [pos], indexList, indexList);
 }
 
+// Récupère l'action à partir d'un message
+string getMessageAction(string message)
+{
+    return llGetSubString(message, llList2Integer(comPositionInfoAction,0), llList2Integer(comPositionInfoAction,1));
+}
+
+// Retourne les informations si elles concernent le bot
+string getMessageBotInfo(string message)
+{
+    return llGetSubString(message, llList2Integer(comBotInfo,0), llList2Integer(comBotInfo,1));
+}
+
+// Retourne l'index de la camera quand bot info
+string getMessageBotInfoIndexCam(string message)
+{
+    return llGetSubString(message, llList2Integer(comBotIndexCam,0), llList2Integer(comBotIndexCam,1));
+}
+
+
+
+// --------------------------------------------
+//               Gestion des droits
+// -------------------------------------------
+
 /*         ------   Droits    ------               */
 /* Donne les droits au controle de la camera */
 DroitCameraOn()
@@ -244,7 +272,7 @@ recupereInformation(string message)
 
 }
 // Charge la position de la caméra
-updateCamera(integer bouton, integer indexCam)
+updateCamera(integer indexCam)
 {
     vector pos = getVector(indexCam);
     rotation rot = getRotation(indexCam);
@@ -296,10 +324,26 @@ updateRandomCamera()
         indexCam = (integer)llFrand(40.0)/2;
     integer indexBoutonCam = getBoutonFromCameraIndex(indexCam);
     llSleep(2);
-    updateCamera(indexBoutonCam, indexCam);
+    updateCamera(indexCam);
     llSleep(0.5);
     llSetLinkTextureAnim(1, ANIM_ON | REVERSE , ALL_SIDES, 1, 60, 0, 60, 30);
     
+}
+
+/* -- Permet de faire une transition sur le mode  -- */
+etatManuelStatic(integer indexCam)
+{
+    updateCamera(indexCam);
+    veille = 0;
+    if(TRUE)
+        state manuelStatic;
+}
+
+/* -- permet de revenir sur l'état manuel  -- */
+etatAutomatique()
+{
+    if(TRUE)
+        state default;
 }
 
 default
@@ -320,11 +364,24 @@ default
     listen(integer channel, string name, key id, string message)
     {
          string action = llGetSubString(message, llList2Integer(comPositionInfoAction,0) , llList2Integer(comPositionInfoAction,1));
-         string indexCam = llGetSubString(message, llList2Integer(comPositionIndexCamera,0) , llList2Integer(comPositionIndexCamera,1));
+         string botInfo = llGetSubString(message, llList2Integer(comBotInfo,0) , llList2Integer(comBotInfo,1));
+
+        
+         debug((string) botInfo + " - " + ACTION_BOT_CAME);
 
         /* -- Récupération des données -- */
         if(action == ACTION_GIV_INFO)
+        {    
+            debug("rentré dans info");
             recupereInformation(message);
+        }
+        else if (botInfo == ACTION_BOT_CAME || botInfo == ACTION_BOT_MFIX)
+        {    
+            integer indexCamBot =(integer) llGetSubString(message, llList2Integer(comBotIndexCam,0), llList2Integer(comBotIndexCam,1));
+            debug("entré dans cam " + (string) indexCamBot + "chaine : " +  (string) indexCamBot);
+            etatManuelStatic(indexCamBot);
+        }
+
     }
 
     timer()
@@ -332,4 +389,39 @@ default
         updateRandomCamera();
     }
 
+}
+state manuelStatic
+{
+     on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+    state_entry()
+    {
+        debug("changement d'etat");
+        llListen(channel, "", NULL_KEY, "");
+        veille = 0;
+        llSetTimerEvent(15);
+        updateCamera(camEnCours);
+        debug("Passage en manuel static");
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+         string indexCam = getMessageBotInfoIndexCam(message);
+         string botOrder = getMessageBotInfo(message);
+         
+         if(botOrder == ACTION_BOT_CAME)
+         {
+             updateCamera((integer)indexCam);
+         }
+    }
+
+    timer()
+    {
+        veille = veille+1;
+        
+        if (veille == 2)
+            etatAutomatique();
+    }
 }
