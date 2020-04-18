@@ -1,0 +1,21 @@
+# Dsistrict - Base de donnée pour le HUD d'application
+# ======================================================
+#La formalisation des données se fait sous cette forme : 
+# [Identifiant de la texture], [type de la texture], [Identifiant du prims], [Face du prim], [UUID de la texture]
+#
+# Identifiant de la texture : Correspond à l'identifiant il se fait sou cette forme TEXTURE_1, TEXTURE_2, TEXTURE_3, ....
+# type de la texture : les texture peuvent être de 3 types : NORMAL, BUMP, SPECULAR
+# Identifiant du prims : Identifiant de l'objet. 
+# Face du prim : Identifiant de la face concerné par la texture. 
+# UUID de la texture : Identifiant UUID de la texture 
+#
+#
+#
+TEXTURE_1 NORMAL 1 3 1adaa06a-4390-2a85-6976-6930cda72211
+
+TEXTURE_2 NORMAL 1 2 084d4044-5591-9750-3248-6bb513ad3be5
+
+TEXTURE_3 NORMAL 1 1 92363e9f-4a8b-c1fc-e6fa-ac7d4c7a0029
+TEXTURE_3 NORMAL 1 1 1adaa06a-4390-2a85-6976-6930cda72211
+TEXTURE_3 BUMP 1 1 30fa7af9-5f35-650e-f429-6782e51b7dde
+TEXTURE_3 SPECULAR 1 1  f53030e3-6ee8-9e23-ab59-6ade9a95ba47
