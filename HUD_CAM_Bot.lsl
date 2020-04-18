@@ -272,10 +272,26 @@ recupereInformation(string message)
 
 }
 // Charge la position de la caméra
-updateCamera(integer indexCam)
+updateCamera(integer indexCam, integer transition )
 {
+    debug("Lancement fondu");
     vector pos = getVector(indexCam);
     rotation rot = getRotation(indexCam);
+    float tempsFondu = 0;
+    veille = 0;
+       
+    if(transition > 0) 
+         tempsFondu =(integer) transition /2;
+         
+    debug("Lancement du fondu");
+            
+    /* -- Si fondu au noir -- */
+    if (tempsFondu > 0 )
+    {
+         llSetLinkTextureAnim(1, ANIM_ON , ALL_SIDES, 1, 60, 0, 60, 60/tempsFondu);
+         llSleep(tempsFondu-1);
+         debug("attente");
+    }
 
 
     //debug("UpdateCamera() - Position " +(string) pos + " rotation : "+(string) rot );
@@ -294,6 +310,14 @@ updateCamera(integer indexCam)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
         CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
         ]);
+         
+    /* -- Si fondu au noir sortie --*/
+    if(transition> 0)
+    {
+        llSleep(0.02);
+        llSetLinkTextureAnim(1, ANIM_ON | REVERSE , ALL_SIDES, 1, 60, 0, 60, 60/tempsFondu);
+        llSleep(tempsFondu);
+    }
 
     infoCam(indexCam);
 }
@@ -324,7 +348,7 @@ updateRandomCamera()
         indexCam = (integer)llFrand(40.0)/2;
     integer indexBoutonCam = getBoutonFromCameraIndex(indexCam);
     llSleep(2);
-    updateCamera(indexCam);
+    updateCamera(indexCam,4);
     llSleep(0.5);
     llSetLinkTextureAnim(1, ANIM_ON | REVERSE , ALL_SIDES, 1, 60, 0, 60, 30);
     
@@ -333,7 +357,7 @@ updateRandomCamera()
 /* -- Permet de faire une transition sur le mode  -- */
 etatManuelStatic(integer indexCam)
 {
-    updateCamera(indexCam);
+    updateCamera(indexCam,0);
     veille = 0;
     if(TRUE)
         state manuelStatic;
@@ -358,7 +382,7 @@ default
         llListen(channel, "", NULL_KEY, "");
         llSleep(1);
         appelInfoUpdate();
-        llSetTimerEvent(7);
+        llSetTimerEvent(9);
     }
 
     listen(integer channel, string name, key id, string message)
@@ -401,8 +425,8 @@ state manuelStatic
         debug("changement d'etat");
         llListen(channel, "", NULL_KEY, "");
         veille = 0;
-        llSetTimerEvent(15);
-        updateCamera(camEnCours);
+        llSetTimerEvent(30);
+
         debug("Passage en manuel static");
     }
 
@@ -413,7 +437,7 @@ state manuelStatic
          
          if(botOrder == ACTION_BOT_CAME)
          {
-             updateCamera((integer)indexCam);
+             updateCamera((integer)indexCam,0);
          }
     }
 
@@ -421,7 +445,7 @@ state manuelStatic
     {
         veille = veille+1;
         
-        if (veille == 2)
+        if (veille => 2 )
             etatAutomatique();
     }
 }
