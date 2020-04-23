@@ -16,7 +16,7 @@ debug(string message)
 // -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 //                        Variables 
 // -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-integer time = 10;
+integer time = 15;
 integer decrade = 1;
 list data_pos =[  <0.0, 0.0, 0.0>,  
 	<0.0, 0.0, 0.0>, 
@@ -31,6 +31,7 @@ list data_rot =[ <0.0,0.0,0.0,0.0>,
 	<0.0,0.0,0.0,0.0>, 
 	<0.0,0.0,0.0,0.0>];
 vector offsetCamera =  <1.0, 0.0, 0.0>;
+list nombre = [ -0.44998, -0.36989,-0.26979,-0.16967,-0.06959, 0.03051,0.14062,0.23071, 0.34083, 0.43999];
 
 // -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 //                        Fonctions
@@ -101,25 +102,43 @@ vector convertionFocus(vector position, rotation camera)
 /* -- update timer -- */
 updateTimer (integer modif)
 {
-	if(time + modif > 2)
+	integer newTime = time + modif;
+	if(newTime > 2 &&  newTime < 91)
 	{
 		time = time + modif;
 	}
-	debug((string) time);
+	updateLCD(0);
+}
+
+/* -- mise à jours de l'écran LCD--*/
+updateLCD(integer reset)
+{   
+    // calcul de la dizaine 
+    integer dizaine =(integer) llFloor(time/10);
+    integer unite = time - 10*dizaine;
+    
+    // Mise à jours du LCD
+    llSetLinkPrimitiveParamsFast( 28, [ PRIM_TEXTURE, ALL_SIDES, "039868ac-a165-af3a-450c-60240ad7d2fd", <0.1, 1.0, 0.0>, <llList2Float(nombre, unite), 0.0, 0.0>, 0 ]);
+    if (unite == 0 || reset == 1 || unite == 9)
+    llSetLinkPrimitiveParamsFast( 26, [ PRIM_TEXTURE, ALL_SIDES, "039868ac-a165-af3a-450c-60240ad7d2fd", <0.1, 1.0, 0.0>, <llList2Float(nombre, dizaine), 0.0, 0.0>, 0 ]);
+    
 }
 
 default
 {
+	
+	
     state_entry()
     {
     	DroitCameraOn();
+    	updateLCD(1);
     }
     
     touch_start(integer num_detected)
     {
 	    string detectedElement = llGetLinkName(llDetectedLinkNumber(0));
 	    string element = llGetSubString(detectedElement,0,3);
-	    debug(detectedElement +" " + element);
+	    //debug(detectedElement +" " + element);
 	    
 	    // Si update 
 	    if (element == "UPDA")
@@ -130,9 +149,5 @@ default
 			updateTimer(1);
 		 else if (detectedElement == "TIME_-")
 			updateTimer(-1);
-	    else if (element =="RUN")
-	    {
-	    	
-	    }
     }
 }
