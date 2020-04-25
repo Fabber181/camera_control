@@ -16,6 +16,10 @@ list data = [
     ];
 integer curentTexture = 0;
 key TEXTURE_TEST = "bbc281a3-d4c9-6c72-6657-b5935d621905";
+key TEXTURE_THX = "dbf67e3d-4f49-cf76-52b7-73154d6c703f";
+integer sum = 0;
+string thxTemplate;
+list thx ;
 
 /* -- Script qui permet de setter une texture -- */
 setTexture (integer prims,integer face, key id)
@@ -26,15 +30,14 @@ setTexture (integer prims,integer face, key id)
 /* Script qui load toutes les texture sur le preload */
 updatePreload()
 {
-    llSay(0, "preload");
-    setTexture(3,0,TEXTURE_TEST);
+    setTexture(4,0,TEXTURE_TEST);
 
     integer nbFace = llGetListLength(data);
     integer i;
     setAnim(FALSE);
     for(i=0;i<nbFace;i++)
     {
-        setTexture(4, i+1, llList2Key(data, i));
+        setTexture(2, i+1, llList2Key(data, i));
     }
 }
 
@@ -43,18 +46,17 @@ setAnim(integer animation)
 {
     if (animation == TRUE)
     {
-        llSetLinkTextureAnim(3, ANIM_ON | LOOP |PING_PONG , ALL_SIDES, 6, 6, 0, 36, 10);
+        llSetLinkTextureAnim(4, ANIM_ON | LOOP |PING_PONG , ALL_SIDES, 6, 6, 0, 36, 10);
     }
     else
     {
-        llSetLinkTextureAnim(3, FALSE, ALL_SIDES, 1, 1, 0.0, 0.0, 0.1);
+        llSetLinkTextureAnim(4, FALSE, ALL_SIDES, 1, 1, 0.0, 0.0, 0.1);
     }
 }
 
 /* Etat en mode lecture */
 changerEtatLecture()
 {
-    llSay(0,"Changement etata");
     if( 1 == 1 )
     {
         state lecture;
@@ -63,12 +65,12 @@ changerEtatLecture()
 
 fadeIn()
 {
-    llSetLinkTextureAnim(1, ANIM_ON , ALL_SIDES, 1, 60, 0, 60, 30);
+    llSetLinkTextureAnim(5, ANIM_ON , ALL_SIDES, 1, 60, 0, 60, 30);
 }
 
 fadeOut()
 {
-        llSetLinkTextureAnim(1, ANIM_ON | REVERSE, ALL_SIDES , 1, 60, 0, 60, 30);
+        llSetLinkTextureAnim(5, ANIM_ON | REVERSE, ALL_SIDES , 1, 60, 0, 60, 30);
 }
 
 /* -- Changement de texture -- */
@@ -81,47 +83,83 @@ changementTexture()
         next = (integer) llFrand(llGetListLength(data)) - 1;
     }
     llSleep(2);
-    setTexture(3,0,llList2Key(data, next));
+    setTexture(4,0,llList2Key(data, next));
     fadeOut();
 
 
     curentTexture = next;
 }
 
-/* -- Merci -- */
+changementTextureThx()
+{
+	llSetTimerEvent(0);
+	fadeIn();
+	llSleep(2);
+	setTexture(4,0,TEXTURE_THX);
+	fadeOut();
+	llSetTimerEvent(15);
+}
+
+updateText(integer active)
+{
+	if(active)
+		llSetText("Tip-jar \n Veecky \n " + (string) sum + "l$", <1.0,1.0,1.0>,1.0);
+	else
+		llSetText("",<1.0,1.0,1.0>,1.0);
+}
 
 default
 {
     state_entry()
     {
+    	updateText(FALSE);
         updatePreload();
         fadeOut();
+        state attenteActivation;
     }
-    touch_start(integer num_detected)
+}
+
+state attenteActivation
+{
+	state_entry()
+	{
+		llOwnerSay("
+		================================
+		         Video Tip Jar - READY -
+		             Click to start
+		===============================");
+		llSetClickAction(CLICK_ACTION_TOUCH);
+	}
+	touch(integer num_detected)
     {
-        llSay(0, "touché ");
         if(llDetectedKey(0) == llGetOwner())
-        	changerEtatLecture();
+            changerEtatLecture();
     }
 }
 
 state lecture
 {
+	on_rez(integer start_param)
+	{
+		llResetScript();
+	}
     state_entry()
     {
-        llSay(0, "animation");
+    	updateText(TRUE);
         llSetTimerEvent(15);
         setAnim(TRUE);
         changementTexture();
         llSetPayPrice(PAY_DEFAULT, [50, 100, 150, 200]);
+        llSetClickAction(CLICK_ACTION_PAY);
     }
     timer()
     {
-        fadeIn();
         changementTexture();
     }
     money(key id, integer amount)
     {
-    	llSay(0, " " + (string) llGet);
+    	sum = sum + amount;
+    	updateText(TRUE);
+    	changementTextureThx();
     }
 }
