@@ -16,8 +16,12 @@ debug(string message)
 // -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 //                        Variables 
 // -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-integer time = 15;
-integer decrade = 1;
+integer time = 5;
+integer degrade = TRUE;
+integer lecture = FALSE;
+integer camEnCours = 0;
+vector COULEUR_VERT = 	<0.239, 0.600, 0.439>;
+vector COULEUR_BLANC = <1.000, 1.000, 1.000>;
 list data_pos =[  <0.0, 0.0, 0.0>,  
 	<0.0, 0.0, 0.0>, 
 	<0.0, 0.0, 0.0>,  
@@ -37,15 +41,25 @@ list nombre = [ -0.44998, -0.36989,-0.26979,-0.16967,-0.06959, 0.03051,0.14062,0
 //                        Fonctions
 // -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
+/* Gestion de la couleur des prims */
+couleur(integer prims, vector couleur)
+{
+    llSetLinkPrimitiveParamsFast(prims, [PRIM_COLOR, ALL_SIDES, couleur, 1.0]);
+}
 
 /*
  Méthode qui prend les droits si nécessaire :
 */
 DroitCameraOn()
 {
-    // Si pas de droit
-    llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA | PERMISSION_TRACK_CAMERA);
-    llSetCameraParams([CAMERA_ACTIVE, 1]);
+	
+	if(llGetPermissions()!=PERMISSION_CONTROL_CAMERA)
+	{
+	    // Si pas de droit
+	    llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA | PERMISSION_TRACK_CAMERA);
+	    llSetCameraParams([CAMERA_ACTIVE, 1]);
+    }
+    
 }
 
 /*
@@ -73,6 +87,7 @@ setCameraPosition(integer indexCam)
 {
 	vector pos = llList2Vector(data_pos, indexCam);
 	rotation rot = llList2Rot(data_rot, indexCam);
+	DroitCameraOn();
 	
 	 llSetCameraParams([
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
@@ -89,8 +104,38 @@ setCameraPosition(integer indexCam)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
         CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters	
         ]);
+        camEnCours = indexCam;
 }
 
+
+/* --  Set une camera random   -- */
+updateRandomCamera()
+{
+	integer indexCam = (integer)llFrand(24.0)/4;
+	debug("Entrée - Camen en cours = " + (string )  camEnCours  + " - " + (string) indexCam);
+    while(camEnCours == indexCam)
+    {
+    	indexCam = (integer)llFrand(24.0)/4;
+    	debug( "Boucle " + (string) indexCam);
+    }
+    debug( "Final " + (string) indexCam);
+	if(degrade)
+    	llSetLinkTextureAnim(21, ANIM_ON , ALL_SIDES, 1, 60, 0, 60, 30);
+    llSleep(2);
+    setCameraPosition(indexCam);
+    if (degrade)
+    {
+	    llSleep(0.5);
+	    llSetLinkTextureAnim(21, ANIM_ON | REVERSE , ALL_SIDES, 1, 60, 0, 60, 30);
+	}
+    
+}
+
+/* -- Clear cam -- */
+updateCameraClear()
+{
+	llClearCameraParams();
+}
 /* -- Convertion de rotation en focus -- */
 vector convertionFocus(vector position, rotation camera)
 {
@@ -108,6 +153,7 @@ updateTimer (integer modif)
 		time = time + modif;
 	}
 	updateLCD(0);
+	llSetTimerEvent(time);
 }
 
 /* -- mise à jours de l'écran LCD--*/
@@ -121,13 +167,50 @@ updateLCD(integer reset)
     llSetLinkPrimitiveParamsFast( 28, [ PRIM_TEXTURE, ALL_SIDES, "039868ac-a165-af3a-450c-60240ad7d2fd", <0.1, 1.0, 0.0>, <llList2Float(nombre, unite), 0.0, 0.0>, 0 ]);
     if (unite == 0 || reset == 1 || unite == 9)
     llSetLinkPrimitiveParamsFast( 26, [ PRIM_TEXTURE, ALL_SIDES, "039868ac-a165-af3a-450c-60240ad7d2fd", <0.1, 1.0, 0.0>, <llList2Float(nombre, dizaine), 0.0, 0.0>, 0 ]);
-    
 }
+
+// lancement de l'autoPLay
+activeAutoplay()
+{
+	if(lecture == FALSE)
+	{	
+		couleur(27, COULEUR_VERT);
+		llSetTimerEvent(time);
+	}
+	else
+	{
+		couleur(27, COULEUR_BLANC);
+		llSetTimerEvent(0);
+
+	}
+	lecture = !lecture;
+		
+}
+
+// lancement de l'autoPLay
+activeDegrade()
+{
+	if(degrade == FALSE)
+	{	
+		couleur(22, COULEUR_VERT);
+	}
+	else
+	{
+		couleur(22, COULEUR_BLANC);
+	}
+	degrade = !degrade;
+		
+}
+
+
 
 default
 {
 	
-	
+	on_rez(integer start_param)
+	{
+		DroitCameraOn();
+	}
     state_entry()
     {
     	DroitCameraOn();
@@ -138,7 +221,7 @@ default
     {
 	    string detectedElement = llGetLinkName(llDetectedLinkNumber(0));
 	    string element = llGetSubString(detectedElement,0,3);
-	    //debug(detectedElement +" " + element);
+	    debug(detectedElement +" " + element);
 	    
 	    // Si update 
 	    if (element == "UPDA")
@@ -149,5 +232,15 @@ default
 			updateTimer(1);
 		 else if (detectedElement == "TIME_-")
 			updateTimer(-1);
+		else if (detectedElement == "RUN")
+			activeAutoplay();
+		else if (element == "RESE")
+			updateCameraClear();
+		else if (element == "DEGR")
+			activeDegrade();
     }
+	timer()
+	{
+		updateRandomCamera();
+	}
 }
