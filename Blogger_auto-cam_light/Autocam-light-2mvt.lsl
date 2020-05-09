@@ -23,7 +23,7 @@ list data_rot =[ <0.0,0.0,0.0,0.0>, // Rotation of Camera
     <0.0,0.0,0.0,0.0>,
     <0.0,0.0,0.0,0.0>,
     <0.0,0.0,0.0,0.0>];
-    
+
 // For Mooving camera
 // Cam A
 list data_pos_1 =[  <0.0, 0.0, 0.0>, // Position Data of camera
@@ -34,12 +34,12 @@ list data_rot_1 =[ <0.0,0.0,0.0,0.0>, // Rotation of Camera
 list data_pos_2 =[  <0.0, 0.0, 0.0>, // Position Data of camera
    <0.0, 0.0, 0.0> ];
 list data_rot_2 =[ <0.0,0.0,0.0,0.0>, // Rotation of Camera
-    <0.0,0.0,0.0,0.0>];   
-    
-    
+    <0.0,0.0,0.0,0.0>];
+
+
 vector offsetCamera =  <1.0, 0.0, 0.0>; // Camera Offset
 
-// Other           0           1        2       3         4       5        6       7        8        9 
+// Other           0           1        2       3         4       5        6       7        8        9
 list nombre = [ -0.44998, -0.36989,-0.26979,-0.16967,-0.06959, 0.03051,0.14062,0.23071, 0.34083, 0.43999]; // LCD Values
 vector COULEUR_VERT =     <0.239, 0.600, 0.439>; // Green color
 vector COULEUR_BLANC = <1.000, 1.000, 1.000>; // White color
@@ -74,13 +74,13 @@ couleur(integer prims, vector couleur)
 
 
 // ----------------------------- GET ----------------------------
-// Get the camera index from prims title 
+// Get the camera index from prims title
 integer getStaticCameraIndexFromElement(string detectedElement)
 {
     return (integer) llGetSubString(detectedElement, 5,6);
 }
 
-// Get the camera index from prims title 
+// Get the camera index from prims title
 string getMoovingCameraIndexFromElement(string detectedElement)
 {
     return (string) llGetSubString(detectedElement, 7,8);
@@ -155,8 +155,6 @@ setStaticCameraPosition(integer indexCam)
 //                           Fonctions
 // -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
-// ----------------------- Camera Feeding -------------------------
-
 // Right of the hud session
 cameraRightOn()
 {
@@ -166,12 +164,6 @@ cameraRightOn()
         llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA | PERMISSION_TRACK_CAMERA);
         llSetCameraParams([CAMERA_ACTIVE, 1]);
     }
-}
-
-/* -- Clear cam -- */
-clearCam()
-{
-    llClearCameraParams();
 }
 
 /* --  Set une camera random   -- */
@@ -197,7 +189,12 @@ updateRandomCamera()
 
 }
 
-// ----------------------- Camera Feeding -------------------------
+/* -- Clear cam -- */
+clearCam()
+{
+    llClearCameraParams();
+}
+
 
 // ===================== Mise aux normes =================================
 
