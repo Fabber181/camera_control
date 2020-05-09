@@ -298,7 +298,7 @@ updateCamera(integer indexCam, integer transition )
      llSetCameraParams([
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
         CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
-        CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
+        CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters 
         CAMERA_FOCUS, convertionFocus(pos, rot), // region relative position
         CAMERA_FOCUS_LAG, 0.0 , // (0 to 3) seconds
         CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
@@ -321,7 +321,7 @@ updateCamera(integer indexCam, integer transition )
 
     infoCam(indexCam);
 }
-/* -- En vois un message dans le local avec l'ancienne camera utilsié / Nouvelle -- */
+/* -- En vois un message dans le local avec l'ancienne camera utilsié / Nouvelle -- */ 
 infoCam(integer indexCam)
 {
     llRegionSay(channel, "INF_CAM      ON_"+(string) indexCam + "     OFF_"+ (string) camEnCours);
@@ -334,8 +334,6 @@ infoCam(integer indexCam)
 /* -- Convertion de rotation en focus -- */
 vector convertionFocus(vector position, rotation camera)
 {
-    vector rot=llRot2Euler(camera);
-    camera = llEuler2Rot(rot);
     return position + offsetCamera*camera;
 }
 

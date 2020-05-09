@@ -37,7 +37,7 @@ list data_rot_2 =[ <0.0,0.0,0.0,0.0>, // Rotation of Camera
     <0.0,0.0,0.0,0.0>];
 
 
-vector offsetCamera =  <1.0, 0.0, 0.0>; // Camera Offset
+vector offsetCamera =  <1.000, 0.000, 0.000>; // Camera Offset
 
 // Other           0           1        2       3         4       5        6       7        8        9
 list nombre = [ -0.44998, -0.36989,-0.26979,-0.16967,-0.06959, 0.03051,0.14062,0.23071, 0.34083, 0.43999]; // LCD Values
@@ -57,7 +57,8 @@ debug(string message)
 {
     if(modeDebug == 1)
     {
-        llSay(0,message);
+        //llSay(0,message);
+        llOwnerSay(message);
     }
 }
 
@@ -81,16 +82,23 @@ integer getStaticCameraIndexFromElement(string detectedElement)
 }
 
 // Get the camera index from prims title
-string getMoovingCameraIndexFromElement(string detectedElement)
+integer getMoovingCameraIndexFromElement(string detectedElement)
 {
-    return (string) llGetSubString(detectedElement, 7,8);
+    return (integer) llGetSubString(detectedElement, 7,7);
+}
+
+// Get Camera Key Point
+string getMoovingCameraKeyFrameElement(string detectedElement)
+{
+    debug(detectedElement + " " + (string) llGetSubString(detectedElement, 9,9));
+    return (string) llGetSubString(detectedElement, 9,9);
 }
 
 // --------------------------- SET -----------------------------
 // Set the camera information
 setStaticCamInfo(integer indexCam)
 {
-    debug((string)llGetCameraPos() + " " + (string) indexCam);
+    debug((string)llGetCameraPos() + " " + (string) llGetCameraRot() + " "+ (string) indexCam);
     data_pos = llListReplaceList(data_pos, [llGetCameraPos()], indexCam, indexCam);
     data_rot = llListReplaceList(data_rot, [llGetCameraRot()], indexCam, indexCam);
 }
@@ -98,7 +106,7 @@ setStaticCamInfo(integer indexCam)
 // Set the param for mooving camera
 setMoovingCamInfo(integer indexCam, string increment)
 {
-    debug((string)llGetCameraPos() + " " + (string) indexCam + " " + (string) increment);
+    debug(" pos" + (string)llGetCameraPos() + "rot" + (string)llGetCameraRot() + " index " + (string) indexCam + " keyframe " + (string) increment);
     if(indexCam == 1)
     {
         if (increment == "A")
@@ -132,6 +140,7 @@ setStaticCameraPosition(integer indexCam)
 {
     vector pos = llList2Vector(data_pos, indexCam);
     rotation rot = llList2Rot(data_rot, indexCam);
+    debug("Rotation envoyée" +  (string) rot + "Convertion" + (string) convertionFocus(pos, rot));
     cameraRightOn();
 
      llSetCameraParams([
@@ -169,22 +178,22 @@ cameraRightOn()
 /* --  Set une camera random   -- */
 updateRandomCamera()
 {
-    integer indexCam = (integer)llFrand(24.0)/4;
+    integer indexCam = (integer) llFrand(llGetListLength(data_pos)*4)/4;
     debug("Entrée - Camen en cours = " + (string )  camEnCours  + " - " + (string) indexCam);
     while(camEnCours == indexCam)
     {
-        indexCam = (integer)llFrand(24.0)/4;
+        indexCam = (integer) llFrand(llGetListLength(data_pos)*4)/4;
         debug( "Boucle " + (string) indexCam);
     }
     debug( "Final " + (string) indexCam);
     if(degrade)
-        llSetLinkTextureAnim(21, ANIM_ON , ALL_SIDES, 1, 60, 0, 60, 30);
+        llSetLinkTextureAnim(23, ANIM_ON , ALL_SIDES, 1, 60, 0, 60, 30);
     llSleep(2);
     setStaticCameraPosition(indexCam);
     if (degrade)
     {
         llSleep(0.5);
-        llSetLinkTextureAnim(21, ANIM_ON | REVERSE , ALL_SIDES, 1, 60, 0, 60, 30);
+        llSetLinkTextureAnim(23, ANIM_ON | REVERSE , ALL_SIDES, 1, 60, 0, 60, 30);
     }
 
 }
@@ -204,7 +213,16 @@ clearCam()
 // -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
 
-
+/* -- Joue les mouvement de camera -- */
+playCameraMoovement(integer indexCamera)
+{
+	// Récupération des données
+	debug((string)data_pos_1);
+	
+	// Test des données
+	
+	// Définition du vecteur de déplacement
+}
 
 /* -- Convertion de rotation en focus -- */
 vector convertionFocus(vector position, rotation camera)
@@ -234,9 +252,9 @@ updateLCD(integer reset)
     integer unite = time - 10*dizaine;
 
     // Mise à jours du LCD
-    llSetLinkPrimitiveParamsFast( 28, [ PRIM_TEXTURE, ALL_SIDES, "039868ac-a165-af3a-450c-60240ad7d2fd", <0.1, 1.0, 0.0>, <llList2Float(nombre, unite), 0.0, 0.0>, 0 ]);
+    llSetLinkPrimitiveParamsFast( 30, [ PRIM_TEXTURE, ALL_SIDES, "039868ac-a165-af3a-450c-60240ad7d2fd", <0.1, 1.0, 0.0>, <llList2Float(nombre, unite), 0.0, 0.0>, 0 ]);
     if (unite == 0 || reset == 1 || unite == 9)
-    llSetLinkPrimitiveParamsFast( 26, [ PRIM_TEXTURE, ALL_SIDES, "039868ac-a165-af3a-450c-60240ad7d2fd", <0.1, 1.0, 0.0>, <llList2Float(nombre, dizaine), 0.0, 0.0>, 0 ]);
+    llSetLinkPrimitiveParamsFast(28, [ PRIM_TEXTURE, ALL_SIDES, "039868ac-a165-af3a-450c-60240ad7d2fd", <0.1, 1.0, 0.0>, <llList2Float(nombre, dizaine), 0.0, 0.0>, 0 ]);
 }
 
 // lancement de l'autoPLay
@@ -244,12 +262,12 @@ activeAutoplay()
 {
     if(lecture == FALSE)
     {
-        couleur(27, COULEUR_VERT);
+        couleur(29, COULEUR_VERT);
         llSetTimerEvent(time);
     }
     else
     {
-        couleur(27, COULEUR_BLANC);
+        couleur(29, COULEUR_BLANC);
         llSetTimerEvent(0);
 
     }
@@ -261,17 +279,17 @@ activeAutoplay()
 activeDegrade()
 {
     if(degrade == FALSE)
-    {
-        couleur(22, COULEUR_VERT);
-    }
+        couleur(24, COULEUR_VERT);
     else
-    {
-        couleur(22, COULEUR_BLANC);
-    }
+        couleur(24, COULEUR_BLANC);
     degrade = !degrade;
 
 }
 
+fonctionToutch(string nomBouton)
+{
+	
+}
 
 
 default
@@ -290,24 +308,38 @@ default
     touch_start(integer num_detected)
     {
         string detectedElement = llGetLinkName(llDetectedLinkNumber(0));
-        string element = llGetSubString(detectedElement,0,3);
-        debug(detectedElement +" " + element);
+        integer boutonAnime = (string) llGetSubString(detectedElement, 0,0) == "M";
+        debug(detectedElement);
 
-        // Si update
-        if (element == "UPDA")
-            setStaticCamInfo(getStaticCameraIndexFromElement(detectedElement));
-        else if (element == "PLAY")
-            setStaticCameraPosition(getStaticCameraIndexFromElement(detectedElement));
-        else if (detectedElement == "TIME_+")
-            updateTimer(1);
-         else if (detectedElement == "TIME_-")
-            updateTimer(-1);
-        else if (detectedElement == "RUN")
-            activeAutoplay();
-        else if (element == "RESE")
-            clearCam();
-        else if (element == "DEGR")
-            activeDegrade();
+    if(!boutonAnime)
+    {
+        string element = llGetSubString(detectedElement,0,3);
+            // Si update
+            if (element == "UPDA")
+                setStaticCamInfo(getStaticCameraIndexFromElement(detectedElement));
+            else if (element == "PLAY")
+                setStaticCameraPosition(getStaticCameraIndexFromElement(detectedElement));
+            else if (detectedElement == "TIME_+")
+                updateTimer(1);
+            else if (detectedElement == "TIME_-")
+                updateTimer(-1);
+            else if (detectedElement == "RUN")
+                activeAutoplay();
+            else if (element == "RESE")
+                clearCam();
+            else if (element == "DEGR")
+                activeDegrade();
+        }
+        else
+        {
+            string element = llGetSubString(detectedElement,2,5);
+        
+            if(element == "UPDA")
+                setMoovingCamInfo(getMoovingCameraIndexFromElement(detectedElement), getMoovingCameraKeyFrameElement(detectedElement));
+            if (element == "PLAY")
+                playCameraMoovement(getStaticCameraIndexFromElement(detectedElement));
+            debug("texture animé");
+        }
     }
     timer()
     {
