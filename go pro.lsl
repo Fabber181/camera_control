@@ -29,13 +29,13 @@ integer channel = 2830;
 list nombre = [0.43999, -0.44998, -0.36989, -0.26979,-0.16967,-0.06959,0.03051,0.14062,0.23071, 0.33081];
 
 // Boutons 
-integer boutonCam = 2;
+integer boutonCam = 18;
 integer faceCamPlus = 5;
 integer faceCamMoins = 1;
 integer primsLcd = 19;
 
 // Constante de lectures
-string INSTANCE_ALL = "ALL";
+string INSTANCE_ALL = "ALL_FOO";
 string ACTOIN_GET_INFO = "GET_INFO";
 string ACTION_SET_INFO= "SET_INFO";
 string ACTION_FIV_INFO= "GIV_INFO";
