@@ -16,15 +16,18 @@ string BOUTON_FAST = "FAST";
 string BOUTON_SEND = "SEND";
 string BOUTON_TEMPLATE_CAM = "CAM_";
 string BOUTON_MANUELLE = "CAM_MA";
+string BOUTON_FONDU = "FONDU";
 
 // Constantes pour la gestion des cameras
 integer cameraFastActive = 0;
+integer cameraFonduActive = TRUE;
 string cameraEnCour = "-1";
 
 // Message 
 string COMMUNICATION_CAM_ACTIVE  = "CAM_ACTIV_CAM_" ;
 string COMMUNICATION_CAM_MANUELL = "CAM_AVTIV_MAN"  ;
 string COMMUNICATION_BOT         = "CAM_AVTIV_BOT"  ;
+string COMMUNICATION_FONDU       = "CAM_ACTIV_FON_"  ;
 
 
 
@@ -86,6 +89,30 @@ changementCameraMan()
     colorBotton("ORAN" , BOUTON_MANUELLE);
     llSleep(0.5);
     colorBotton("BLAN" , BOUTON_MANUELLE);
+}
+
+// -------------- Degradé -------------------------
+/* Méthode qui permet de changer l'option les fondu quand . */
+changementCameraFonduCouleur()
+{
+    // Gestion du fondu.
+     // Camera rapide activée
+    if (cameraFonduActive == TRUE)
+        colorBotton("VERT", "FONDU");
+    // Camera rapide désactivée
+    else 
+        colorBotton("BLAN", "FONDU");
+
+}
+
+/** Méthode qui envoie le message au bot ppour activer/Désactiver le fondu. **/
+envoisBotCameraFondu()
+{
+    cameraFonduActive = !cameraFonduActive ;
+    changementCameraFonduCouleur();
+
+    llRegionSay(chanel, COMMUNICATION_FONDU + (string) cameraFonduActive);
+    debug("envoisBotCameraFondu", "Envois dans le local du message : " + COMMUNICATION_FONDU + (string) cameraFonduActive );
 }
 
 
@@ -166,6 +193,8 @@ default
             gestionCameraRapide();
         else if (bouton == BOUTON_SEND )
             envoisCam();
+        else if (bouton == BOUTON_FONDU)
+             envoisBotCameraFondu();
         else if(llGetSubString(bouton, 0, 3) == "CAM_" )
             inscriptionCamera(llGetSubString(bouton, 4, 5));
 
