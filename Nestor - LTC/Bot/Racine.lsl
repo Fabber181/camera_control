@@ -27,6 +27,7 @@ string COMMANDE_CAM_BOT = "CAM_AVTIV_BOT";
 /* --------------- Bot Cam ------------ */
 list BOT_1_LIST_CAM = [31 , 32 , 33 , 34 , 35 ];
 list BOT_2_LIST_CAM = [36 , 37 , 38 , 39 , 40 ];
+list BOT_4_LIST_CAM = [36 , 37 , 38 , 39 , 40 ];
 list BOT_CAM_EN_COUR = [-1];
 integer BOT_LAST_CAM = -1;
 integer BOT_NB_CAM = 1;

@@ -72,7 +72,7 @@ inscriptionCamera(string codeCam)
     if ((integer) codeCam > 0 )
         changementCamera((integer) codeCam);
     // Camera Bot
-    else if (codeCam == "B1" || codeCam == "B2")
+    else if (codeCam == "B1" || codeCam == "B2" || codeCam == "B3" || codeCam == "B4" || codeCam == "B5") 
         changementCameraBot(codeCam);
     // CameraManuelle
     else if (codeCam == "MA")
@@ -99,7 +99,7 @@ changementCameraBot(string codeCam)
     colorBotton("ORAN" , "CAM_"+ cameraEnCour);
     llSleep(0.5);
     colorBotton("BLAN" , "CAM_"+ cameraEnCour);
-    //debug("changementCameraBot()", "CAM_"+ cameraEnCour);
+    debug("changementCameraBot()", "CAM_"+ cameraEnCour);
 
 }
 

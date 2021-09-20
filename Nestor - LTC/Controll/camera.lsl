@@ -9,9 +9,9 @@
 
 /* ---- Constantes  --------------*/ 
 // Constante Debug 
-integer DEBUG_MODE = TRUE;
-integer DEBUG_LOCAL = TRUE;
-integer DEBUG_CHANEL = 930;
+integer DEBUG_MODE = FALSE;
+integer DEBUG_LOCAL = FALSE;
+integer DEBUG_CHANEL = DEBUG_CHANNEL;
 
 // Canal d'information
 integer CANNAL_INFO = 2830;
@@ -121,25 +121,38 @@ setColor(string color, string element)
 /* -- Remplacement de la position de la camera -- */
 setCameraParam(integer indexCamera)
 {
-    //debug("Lancement de l'index de camera " + (string) indexCamera);
+    debug("Lancement de l'index de camera " + (string) indexCamera);
+
     list positionRotation = getPositionRotation(indexCamera);
-    //debug(llDumpList2String(positionRotation, "-"));
-    
-     llSetCameraParams([
+    debug(llDumpList2String(positionRotation, "-"));
+
+    rotation rotationCam = llList2Rot(positionRotation, 1);
+    vector positionCam = llList2Vector(positionRotation, 0);
+
+    // SI les paramètres ne sont pas de 0
+    if (positionCam.z != 0)
+    {
+
+    llSetCameraParams([
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
         CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
         CAMERA_DISTANCE, 0.0, // ( 0.5 to 10) meters
-        CAMERA_FOCUS, convertionFocus(llList2Vector(positionRotation, 0), llList2Rot(positionRotation, 1)), // region relative position
+        CAMERA_FOCUS, convertionFocus(positionCam, rotationCam), // region relative position
         CAMERA_FOCUS_LAG, 0.0 , // (0 to 3) seconds
         CAMERA_FOCUS_LOCKED, TRUE, // (TRUE or FALSE)
         CAMERA_FOCUS_THRESHOLD, 0.0, // (0 to 4) meters
         //CAMERA_PITCH, 80.0, // (-45 to 80) degrees
-        CAMERA_POSITION, llList2Vector(positionRotation, 0), // region relative position
+        CAMERA_POSITION, positionCam, // region relative position
         CAMERA_POSITION_LAG, 0.0, // (0 to 3) seconds
         CAMERA_POSITION_LOCKED, TRUE, // (TRUE or FALSE)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
         CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
         ]);
+    }
+    else
+    {
+        debug("Sortie");
+    }
 
 }
 
