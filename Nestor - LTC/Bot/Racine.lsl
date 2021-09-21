@@ -23,15 +23,19 @@ string COMMANDE_UPDATE_CAM_INFO = "GIV_INFO";
 string COMMANDE_CAM_ACTIV = "CAM_ACTIV_CAM_";
 string COMMANDE_CAM_MAN = "CAM_ACTIV_MAN";
 string COMMANDE_CAM_BOT = "CAM_AVTIV_BOT";
+string COMMANDE_CAM_FONDU = "CAM_ACTIV_FON_";
 
 /* --------------- Bot Cam ------------ */
 list BOT_1_LIST_CAM = [31 , 32 , 33 , 34 , 35 ];
 list BOT_2_LIST_CAM = [36 , 37 , 38 , 39 , 40 ];
-list BOT_4_LIST_CAM = [36 , 37 , 38 , 39 , 40 ];
+list BOT_3_LIST_CAM = [21 , 22 , 23 , 24 , 25 ];
+list BOT_4_LIST_CAM = [26 , 27 , 28 , 29 , 30 ];
+list BOT_5_LIST_CAM = [16 , 17 , 18 , 19 , 20 ];
 list BOT_CAM_EN_COUR = [-1];
 integer BOT_LAST_CAM = -1;
 integer BOT_NB_CAM = 1;
 integer BOT_ACTIVE = FALSE;
+integer BOT_FONDU = TRUE;
 
 
 /* -------------------- Camera ------------------- */ 
@@ -154,7 +158,7 @@ activerCamera(string code)
     //debug("activerCamera()", "Index de la camera : " + (string) llGetSubString(code, codeIndex, codeIndex+1));
     
     integer indexCamera = (integer) llGetSubString(code, codeIndex, codeIndex+1);
-    setPositionRotationCameraList(indexCamera);
+    setPositionRotationCameraList(indexCamera, BOT_FONDU);
     llSetTimerEvent(0);
 }
 
@@ -163,8 +167,17 @@ activerCamera(string code)
 activerCameraManuelle(string code)
 {
     list cameraPositionRotation = extrairePositionRotation(code);
-    setPositionRotationCamera(llList2Vector(cameraPositionRotation,0) , llList2Rot(cameraPositionRotation,1));
+    setPositionRotationCamera(llList2Vector(cameraPositionRotation,0) , llList2Rot(cameraPositionRotation,1), BOT_FONDU);
     llSetTimerEvent(0);
+}
+
+/* ------------ Gestion camera fondu ------ */
+/* Permet de gerrer le fondu de la camera */
+activerCameraFondu(string code)
+{
+    integer indexCode = llStringLength(COMMANDE_CAM_FONDU) ;
+    debug("activerCameraFondu", "Nombre de carracter" + (string) indexCode + "prise de la valeur " + llGetSubString(code,indexCode, indexCode));
+    integer activationCamera = 0;
 }
 
 /* ------------ Gestion camera bot --------------- */ 
@@ -173,13 +186,22 @@ activerCameraBot(string code)
 {
     integer codeIndex = llStringLength(COMMANDE_CAM_BOT);
     integer indexBot = (integer) llGetSubString(code, codeIndex, codeIndex);
-    //debug("activerCameraBot", "Activation du bot en activation de " + llGetSubString(code, codeIndex, codeIndex));
+    debug("activerCameraBot", "Activation du bot en activation de " + llGetSubString(code, codeIndex, codeIndex));
     
     BOT_ACTIVE = 1;
+
     if(indexBot == 1)
         BOT_CAM_EN_COUR = BOT_1_LIST_CAM;
     else if(indexBot == 2)
         BOT_CAM_EN_COUR = BOT_2_LIST_CAM;
+    else if(indexBot == 3)
+        BOT_CAM_EN_COUR = BOT_3_LIST_CAM;
+    else if(indexBot == 4)
+        BOT_CAM_EN_COUR = BOT_4_LIST_CAM;
+    else if(indexBot == 5)
+        BOT_CAM_EN_COUR = BOT_5_LIST_CAM;
+
+        
     BOT_NB_CAM = llGetListLength(BOT_CAM_EN_COUR)  - 1 ;
     BOT_LAST_CAM = -1;
     setRandomCamera();
@@ -192,26 +214,30 @@ setRandomCamera()
     BOT_LAST_CAM++;
     if(BOT_LAST_CAM > BOT_NB_CAM)
         BOT_LAST_CAM = 0;
-
-    llSetLinkTextureAnim(2, ANIM_ON , ALL_SIDES, 1, 120, 0, 120, 45);
-    llSleep(4);
-    setPositionRotationCameraList(llList2Integer(BOT_CAM_EN_COUR, BOT_LAST_CAM));
-    llSetLinkTextureAnim(2, ANIM_ON | REVERSE , ALL_SIDES, 1, 120, 0, 120, 40);
+    
+    setPositionRotationCameraList(llList2Integer(BOT_CAM_EN_COUR, BOT_LAST_CAM), BOT_FONDU);
 }
 
 /* --------------- Utilitaire ------------------ */
 /* Méthode qui récupère les position des camera dans la list */
-setPositionRotationCameraList(integer indexCamera)
+setPositionRotationCameraList(integer indexCamera, integer fondu)
 {
     vector pos = llList2Vector(cameraListParams, indexCamera*2);
     rotation rot = llList2Rot(cameraListParams, (indexCamera*2) +1);
 
-    setPositionRotationCamera(pos, rot);
+    
+    setPositionRotationCamera(pos, rot, fondu);
+    
 }
 
 /* Méthode qui permet de setter la position de la camera */
-setPositionRotationCamera(vector pos, rotation rot)
+setPositionRotationCamera(vector pos, rotation rot, integer fondu)
 {
+    if (fondu == TRUE)
+    {
+        llSetLinkTextureAnim(2, ANIM_ON , ALL_SIDES, 1, 120, 0, 120, 45);
+        llSleep(4);
+    }
      llSetCameraParams([
         CAMERA_BEHINDNESS_ANGLE, 0.0, // (0 to 180) degrees
         CAMERA_BEHINDNESS_LAG, 0.0, // (0 to 3) seconds
@@ -227,6 +253,10 @@ setPositionRotationCamera(vector pos, rotation rot)
         CAMERA_POSITION_THRESHOLD, 0.0, // (0 to 4) meters
         CAMERA_FOCUS_OFFSET, ZERO_VECTOR // <-10,-10,-10> to <10,10,10> meters
         ]);
+    if(fondu == TRUE)
+    {
+        llSetLinkTextureAnim(2, ANIM_ON | REVERSE , ALL_SIDES, 1, 120, 0, 120, 40);
+    }
 }
 
 /* Méthode qui permet de calculer le focus */
@@ -263,7 +293,7 @@ default
 
     listen( integer channel, string name, key id, string message )
     {
-        //debug("listen", "Ecouteur remonte : " + message + " code comparer " + COMMANDE_CAM_ACTIV  + " l'index renvois : " + (string) llSubStringIndex(message, COMMANDE_CAM_ACTIV)  );
+        //debug("listen", "Ecouteur remonte : " + message + " code comparer " + COMMANDE_CAM_FONDU  + " l'index renvois : " + (string) llSubStringIndex(message, COMMANDE_CAM_FONDU)  );
 
         // Set position Camera (depuis la list d'info)
         if(llSubStringIndex(message, COMMANDE_CAM_ACTIV) >= 0 )
@@ -274,6 +304,9 @@ default
         // Set camera bot
         else if (llSubStringIndex(message, COMMANDE_CAM_BOT) >= 0)
             activerCameraBot(message);
+        // Set Fondu Camera
+        else if (llSubStringIndex(message, COMMANDE_CAM_FONDU) >= 0)
+            activerCameraFondu(message);
         // Mise à jours camera
         else if (llSubStringIndex(message, COMMANDE_UPDATE_CAM_INFO) >= 0)
             setCameraData(message);
@@ -283,7 +316,7 @@ default
 
     timer()
     {
-        debug("timer()", "Lancgement du log");
+        //debug("timer()", "Lancgement du log");
         setRandomCamera();
     }
 
